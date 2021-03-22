@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+		<title>webrtc client</title>
+		<script type="text/javascript">
+
+			function webrtcConnect(){
+				var ip = document.getElementById("ip").value;
+				var port = document.getElementById("port").value;
+				var webrtc_server = "http://" + ip + ":" + port;
+				window.open(webrtc_server);
+			}
+		</script>
+	</head>
+	
+	<body bgcolor="white"> 
+		<div style="text-align:center; vertical-align:middel;"> <p style="font-size:60px;">Simple CloudGame client</p> </div>
+		<div style="text-align:center; vertical-align:middel;"> <p style="font-size:40px;">server ip: <input style="height:40px;width:200px" type="text" id="ip" /></p> </div>
+		<div style="text-align:center; vertical-align:middel;"> <p style="font-size:40px;">server port: <input style="height:40px;width:200px" type="text" id="port" /></p> </div>
+		<div style="text-align:center; vertical-align:middel;"> <button onclick="webrtcConnect();" style="font-size:50px;">connect</button> </div>
+	  
+	</body>
+</html>
