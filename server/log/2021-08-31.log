@@ -1,0 +1,6 @@
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.799	[34minfo[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/initialize/router.go:21	use middleware logger
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.800	[34minfo[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/initialize/router.go:24	use middleware cors
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.800	[34minfo[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/initialize/router.go:26	register swagger handler
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.800	[34minfo[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/initialize/router.go:63	router register success
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.800	[34minfo[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/core/server.go:30	server run success on 	{"address": ":8888"}
+[github.com/flipped-aurora/gin-vue-admin/server]2021/08/31 - 16:40:43.801	[31merror[0m	/home/chenz/GPS_Project/Reference_Webapp_Server/server/core/server.go:40	net.Listen error: listen tcp :8888: bind: address already in use
