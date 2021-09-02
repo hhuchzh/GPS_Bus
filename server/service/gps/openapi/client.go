@@ -102,11 +102,14 @@ func (c *Client) getAccessToken() (*AccessToken, error) {
 
 func (c *Client) refreshAccessToken() (*AccessToken, error) {
     c.mu.RLock()
+    defer c.mu.RUnlock()
+    if c.lastToken == nil {
+        return nil, errors.New("access token null")
+    }
     m := makeCommonParams("jimi.oauth.token.refresh")
     m["access_token"] = c.lastToken.AccessToken
     m["refresh_token"] = c.lastToken.RefreshToken
     m["expires_in"] = strconv.Itoa(tokenExpiresIn)
-    c.mu.RUnlock()
 
     resp := &AccessTokenResp{}
     err := c.api.SendPost(m, appSecret, resp)

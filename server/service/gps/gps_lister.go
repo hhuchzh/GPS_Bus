@@ -16,6 +16,10 @@ var (
     GpsLister = NewGPSLister()
 )
 
+func init() {
+    GpsLister.Start()
+}
+
 type GPSLister struct {
     client *openapi.Client
     lc locationCache
