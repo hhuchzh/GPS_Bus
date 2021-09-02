@@ -7,7 +7,7 @@ aliyun-oss:
   base-path: yourBasePath
 autocode:
   transfer-restart: true
-  root: /home/dongjj/disk1/dongjj/personal/Reference_Webapp_Server
+  root: /home/chenz/go_test/gin-vue-admin
   server: /server
   server-api: /api/v1/autocode
   server-initialize: /initialize
@@ -43,11 +43,11 @@ jwt:
 local:
   path: uploads/file
 mysql:
-  path: 109.123.123.45:3306
+  path: 127.0.0.1:3306
   config: charset=utf8mb4&parseTime=True&loc=Local
   db-name: gva
-  username: dongjj
-  password: dongjj
+  username: root
+  password: "123456"
   max-idle-conns: 0
   max-open-conns: 0
   log-mode: ""
