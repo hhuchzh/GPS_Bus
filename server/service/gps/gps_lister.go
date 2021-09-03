@@ -55,6 +55,19 @@ func (g *GPSLister) ListDevice() ([]openapi.Device, error) {
     return dList, nil
 }
 
+func (g *GPSLister) ListTrack(imei, beginTime, endTime string) ([]openapi.Track, error) {
+    track, err := g.client.ListTrack(imei, beginTime, endTime)
+    if err != nil {
+        return nil, err
+    }
+
+    tList := make([]openapi.Track, 0, len(track))
+    for _, t := range track {
+        tList = append(tList, *t)
+    }
+    return tList, nil
+}
+
 func (g *GPSLister) Start() {
     fmt.Println("****** GPSLister Start")
     g.cron = cron.New(cron.WithSeconds())
