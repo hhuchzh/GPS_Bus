@@ -79,7 +79,7 @@ type Track struct {
     Lng float64 `json:"lng"`
     Lat float64 `json:"lat"`
     GpsTime string `json:"gpsTime"`
-    Direction string `json:"direction"`
-    GpsSpeed string `json:"gpsSpeed"`
-    PosType string `json:"posType"`
+    Direction int `json:"direction"`
+    GpsSpeed float32 `json:"gpsSpeed"`
+    PosType int `json:"posType"`
 }
