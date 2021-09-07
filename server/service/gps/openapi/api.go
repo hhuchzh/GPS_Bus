@@ -56,7 +56,7 @@ func (a *Api) SendPost(params map[string]string, secret string, result interface
     params["sign"] = sign
 
     client := resty.New()
-    client.SetTimeout(10 * time.Second)
+    client.SetTimeout(5 * time.Second)
     resp, err := client.R().
             SetHeader("Content-Type", "application/x-www-form-urlencoded").
             SetQueryParams(params).
