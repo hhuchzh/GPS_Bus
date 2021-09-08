@@ -19,16 +19,25 @@ type token struct {
 }
 
 func (t *token) start(get getFunc, refresh refreshFunc) {
+    var needUpdate bool
+    var delay int64
     t.get = get
     t.refresh = refresh
     err := t.loadToken()
     if err != nil {
+         needUpdate = true
+    } else {
+        if t.lastToken != nil {
+            delay, _ = timeDelay(t.lastToken.Time)
+        }
+        if delay <= 0 {
+            needUpdate = true
+            delay = tokenExpiresIn - 60
+        }
+    }
+    if needUpdate {
         t.update()
         t.saveToken()
-    }
-    var delay int64
-    if t.lastToken != nil {
-        delay, _ = timeDelay(t.lastToken.Time)
     }
     go func() {
         timer := time.NewTimer(time.Duration(delay)*time.Second)
