@@ -19,7 +19,7 @@ const (
 
 type Client struct {
     api *Api
-    lastToken *AccessToken
+    tok *token
     mu sync.RWMutex
     stopCh chan struct{}
 }
@@ -27,21 +27,18 @@ type Client struct {
 func NewClient() (*Client) {
     return &Client{
         api: &Api{},
+        tok: &token{},
         stopCh: make(chan struct{}),
     }
 }
 
+
 func (c *Client) Start() {
-    c.updateAccessToken()
-    c.forceUpdateAccessToken()
+    c.tok.start(c.getAccessToken, c.refreshAccessToken)
     go func () {
-        timer := time.NewTicker((tokenExpiresIn - 60) * time.Second)
         select {
-        case <-timer.C:
-            c.forceUpdateAccessToken()
         case <-c.stopCh:
-            timer.Stop()
-            return
+            c.tok.stop()
         }
     }()
 }
@@ -50,36 +47,8 @@ func (c *Client) Stop() {
     c.stopCh <- struct{}{}
 }
 
-func (c *Client) forceUpdateAccessToken() {
-    newToken, err := c.refreshAccessToken()
-    if err != nil {
-        //TODO
-    } else {
-        c.mu.Lock()
-        c.lastToken = newToken
-        c.mu.Unlock()
-    }
-}
-
-func (c *Client) updateAccessToken() {
-    token, err := c.getAccessToken()
-    if err != nil {
-        //TODO
-    } else {
-        c.mu.Lock()
-        c.lastToken = token
-        c.mu.Unlock()
-    }
-}
-
 func (c *Client) GetAccessToken() (string, error) {
-    c.mu.RLock()
-    defer c.mu.RUnlock()
-    if c.lastToken == nil {
-        return "", errors.New("access token null")
-    }
-    token := c.lastToken.AccessToken
-    return token, nil
+    return c.tok.getToken()
 }
 
 func (c *Client) getAccessToken() (*AccessToken, error) {
@@ -101,14 +70,12 @@ func (c *Client) getAccessToken() (*AccessToken, error) {
 }
 
 func (c *Client) refreshAccessToken() (*AccessToken, error) {
-    c.mu.RLock()
-    defer c.mu.RUnlock()
-    if c.lastToken == nil {
+    if c.tok.lastToken == nil {
         return nil, errors.New("access token null")
     }
     m := makeCommonParams("jimi.oauth.token.refresh")
-    m["access_token"] = c.lastToken.AccessToken
-    m["refresh_token"] = c.lastToken.RefreshToken
+    m["access_token"] = c.tok.lastToken.AccessToken
+    m["refresh_token"] = c.tok.lastToken.RefreshToken
     m["expires_in"] = strconv.Itoa(tokenExpiresIn)
 
     resp := &AccessTokenResp{}
