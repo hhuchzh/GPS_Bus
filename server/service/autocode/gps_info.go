@@ -75,7 +75,7 @@ func (gpsInfoService *GpsInfoService) GetAvailableGpsInfoInfoList(info autoCodeR
 	db := global.GVA_DB.Model(&autocode.GpsInfo{})
 	var gpsInfos []autocode.GpsInfo
 
-	db = db.Where("`bus_id` = ?", nil)
+	db = db.Where("`bus_id` IS NULL")
 
 	err = db.Count(&total).Error
 	err = db.Limit(limit).Offset(offset).Find(&gpsInfos).Error
