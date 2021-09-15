@@ -22,15 +22,18 @@ func init() {
 
 type GPSLister struct {
     client *openapi.Client
-    lc locationCache
+    lc *locationCache
     stopCh chan struct{}
     cron *cron.Cron
+    backend Backend
 }
 
 func NewGPSLister() *GPSLister {
     return &GPSLister{
         client: openapi.NewClient(),
+        lc: NewLocationCache(),
         stopCh: make(chan struct{}),
+        backend: NewBackend(),
     }
 }
 
@@ -76,7 +79,8 @@ func (g *GPSLister) Start() {
         if err != nil {
             fmt.Println("GPSLister client.ListLocation failed: ", err)
         } else {
-            g.lc.replace(location)
+            diff := g.lc.replace(location)
+            g.backend.Save(diff)
         }
     })
     if err != nil {

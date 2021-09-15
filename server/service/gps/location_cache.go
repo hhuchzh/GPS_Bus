@@ -13,6 +13,12 @@ type locationCache struct {
     mu sync.RWMutex
 }
 
+func NewLocationCache() *locationCache {
+    return &locationCache{
+        index: make(map[string]int),
+    }
+}
+
 func (lc *locationCache) get(imei string) (openapi.Location, error) {
     lc.mu.RLock()
     defer lc.mu.RUnlock()
@@ -36,13 +42,22 @@ func (lc *locationCache) list() ([]openapi.Location, error) {
     return locList, nil
 }
 
-func (lc *locationCache) replace(location []*openapi.Location) {
+func (lc *locationCache) replace(location []*openapi.Location) []*openapi.Location {
     lc.mu.Lock()
     defer lc.mu.Unlock()
 
-    lc.location = location
-    lc.index = make(map[string]int, len(location))
+    var diff []*openapi.Location
     for i, loc := range location {
+        idx, ok := lc.index[loc.Imei]
+        if !ok {
+            diff = append(diff, loc)
+        } else {
+            if lc.location[idx].GpsTime != loc.GpsTime {
+                diff = append(diff, loc)
+            }
+        }
         lc.index[loc.Imei] = i
     }
+    lc.location = location
+    return diff
 }
