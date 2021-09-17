@@ -2,6 +2,7 @@ package main
 
 import (
     "time"
+    _ "time/tzdata"
     "fmt"
 )
 
@@ -50,7 +51,10 @@ func (c *Calculator) Calc(startTime, endTime string, price PriceStandard) (float
     }
 
     var totalPrice float64
-    location, _ := time.LoadLocation("Asia/Shanghai")
+    location, err := time.LoadLocation("Asia/Shanghai")
+    if err != nil {
+        return -1, err
+    }
     for {
         isDay := c.inTimeSection(price.Day.StartTime, price.Day.EndTime, t.Hour())
         if isDay {
@@ -94,6 +98,9 @@ func (c *Calculator) inTimeSection(start, end int, hour int) bool {
 }
 
 func toTime(v string) (time.Time, error) {
-    location, _ := time.LoadLocation("Asia/Shanghai")
+    location, err := time.LoadLocation("Asia/Shanghai")
+    if err != nil {
+        return time.Time{}, err
+    }
     return time.ParseInLocation("2006-01-02 15:04:05", v, location)
 }

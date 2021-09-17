@@ -266,12 +266,12 @@ func process(mw *MeterMainWindow) {
         totalPrice, err := calc.Calc(startTime, endTime, ps)
         if err != nil {
             fmt.Println("--> calc.Calc error ", err)
-			s := fmt.Sprintf("第%条数据检测错误： %v\r\n", i+2, err)
+			s := fmt.Sprintf("第%d条数据检测错误： %v\r\n", i+2, err)
 			mw.edit.AppendText(s)
             continue
         }
         originPrice, _ := strconv.ParseFloat(price, 64)
-		
+
 		coord := fmt.Sprintf("%s%d", colName, i+2)
 		err = f.SetCellValue(sheetName, coord, fmt.Sprintf("%.1f", totalPrice))
 		err = f.SetCellStyle(sheetName, coord, coord, style2)
