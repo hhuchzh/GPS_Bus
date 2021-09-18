@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"gorm.io/gorm"
 )
 
 // RouteInfo 结构体
@@ -24,4 +25,9 @@ type RouteInfo struct {
 // TableName RouteInfo 表名
 func (RouteInfo) TableName() string {
 	return "route_info"
+}
+
+func (classes *RouteInfo) AfterDelete(tx *gorm.DB) (err error) {
+	err = tx.Where("route_id = ?", classes.ID).Delete(&ClassesInfo{}).Error
+	return err
 }

@@ -27,4 +27,5 @@ func (BusInfo) TableName() string {
 
 func (bus *BusInfo) AfterDelete(tx *gorm.DB) (err error) {
 	return tx.Model(&GpsInfo{}).Where("bus_id = ?", bus.ID).Update("BusId", nil).Error
+	return tx.Model(&ClassesInfo{}).Where("bus_id = ?", bus.ID).Update("BusId", 0).Error
 }
