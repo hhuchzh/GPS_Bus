@@ -249,6 +249,8 @@ func process(mw *MeterMainWindow) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	
+	var sum float64
     for i, row := range rows {
         startTime := row[startIndex]
         endTime := row[endIndex]
@@ -281,6 +283,7 @@ func process(mw *MeterMainWindow) {
         coord = fmt.Sprintf("%s%d", colName2, i+2)
         if totalPrice < originPrice {
             v := fmt.Sprintf("+%.1f", originPrice - totalPrice)
+			sum = sum + (originPrice - totalPrice)
             err = f.SetCellValue(sheetName, coord, v)
             if err != nil {
                 fmt.Println(err)
@@ -291,6 +294,18 @@ func process(mw *MeterMainWindow) {
 		mw.progressBar.SetValue(int(progress*100))
 		progress += step
     }
+	
+		index:=fmt.Sprintf("%s%d",colName2,totalCount+2)
+		val:=fmt.Sprintf("total:%.1f",sum)
+		err = f.SetCellValue(sheetName, index, val)
+        if err != nil {
+            fmt.Println(err)
+        }
+		err = f.SetCellStyle(sheetName, index, index, style)
+		 if err != nil {
+            fmt.Println(err)
+        }
+	
     err = f.Save()
     if err != nil {
         s := fmt.Sprintf("写入检测结果，保存文件失败\r\n")
