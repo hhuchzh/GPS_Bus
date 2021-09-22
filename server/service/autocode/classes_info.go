@@ -13,7 +13,7 @@ type ClassesInfoService struct {
 // CreateClassesInfo 创建ClassesInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (classesInfoService *ClassesInfoService) CreateClassesInfo(classesInfo autocode.ClassesInfo) (err error) {
-	err = global.GVA_DB.Create(&classesInfo).Error
+	err = global.GVA_DB.Omit("Bus").Create(&classesInfo).Error
 	return err
 }
 
@@ -34,7 +34,7 @@ func (classesInfoService *ClassesInfoService) DeleteClassesInfoByIds(ids request
 // UpdateClassesInfo 更新ClassesInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (classesInfoService *ClassesInfoService) UpdateClassesInfo(classesInfo autocode.ClassesInfo) (err error) {
-	err = global.GVA_DB.Save(&classesInfo).Error
+	err = global.GVA_DB.Omit("Bus").Save(&classesInfo).Error
 	return err
 }
 

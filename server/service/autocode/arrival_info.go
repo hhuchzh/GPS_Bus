@@ -13,7 +13,7 @@ type ArrivalInfoService struct {
 // CreateArrivalInfo 创建ArrivalInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (arrivalInfoService *ArrivalInfoService) CreateArrivalInfo(arrivalInfo autocode.ArrivalInfo) (err error) {
-	err = global.GVA_DB.Create(&arrivalInfo).Error
+	err = global.GVA_DB.Omit("Location").Create(&arrivalInfo).Error
 	return err
 }
 
@@ -34,7 +34,7 @@ func (arrivalInfoService *ArrivalInfoService) DeleteArrivalInfoByIds(ids request
 // UpdateArrivalInfo 更新ArrivalInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (arrivalInfoService *ArrivalInfoService) UpdateArrivalInfo(arrivalInfo autocode.ArrivalInfo) (err error) {
-	err = global.GVA_DB.Save(&arrivalInfo).Error
+	err = global.GVA_DB.Omit("Location").Save(&arrivalInfo).Error
 	return err
 }
 

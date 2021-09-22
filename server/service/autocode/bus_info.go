@@ -13,7 +13,7 @@ type BusInfoService struct {
 // CreateBusInfo 创建BusInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (busInfoService *BusInfoService) CreateBusInfo(busInfo autocode.BusInfo) (err error) {
-	err = global.GVA_DB.Create(&busInfo).Error
+	err = global.GVA_DB.Omit("GpsInfos").Create(&busInfo).Error
 	return err
 }
 
@@ -34,7 +34,7 @@ func (busInfoService *BusInfoService) DeleteBusInfoByIds(ids request.IdsReq) (er
 // UpdateBusInfo 更新BusInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (busInfoService *BusInfoService) UpdateBusInfo(busInfo autocode.BusInfo) (err error) {
-	err = global.GVA_DB.Save(&busInfo).Error
+	err = global.GVA_DB.Omit("GpsInfos").Save(&busInfo).Error
 	return err
 }
 

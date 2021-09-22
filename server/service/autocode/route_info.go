@@ -13,7 +13,7 @@ type RouteInfoService struct {
 // CreateRouteInfo 创建RouteInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (routeInfoService *RouteInfoService) CreateRouteInfo(routeInfo autocode.RouteInfo) (err error) {
-	err = global.GVA_DB.Create(&routeInfo).Error
+	err = global.GVA_DB.Omit("LocationInfos").Create(&routeInfo).Error
 	return err
 }
 
@@ -34,7 +34,7 @@ func (routeInfoService *RouteInfoService) DeleteRouteInfoByIds(ids request.IdsRe
 // UpdateRouteInfo 更新RouteInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (routeInfoService *RouteInfoService) UpdateRouteInfo(routeInfo autocode.RouteInfo) (err error) {
-	err = global.GVA_DB.Save(&routeInfo).Error
+	err = global.GVA_DB.Omit("LocationInfos").Save(&routeInfo).Error
 	return err
 }
 
