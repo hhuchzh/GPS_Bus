@@ -109,9 +109,10 @@ func (arrivalInfoApi *ArrivalInfoApi) UpdateArrivalInfo(c *gin.Context) {
 func (arrivalInfoApi *ArrivalInfoApi) FindArrivalInfo(c *gin.Context) {
 	var arrivalInfo autocode.ArrivalInfo
 	_ = c.ShouldBindQuery(&arrivalInfo)
-	if err, rearrivalInfo := arrivalInfoService.GetArrivalInfo(arrivalInfo.ID); err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
-		response.FailWithMessage("查询失败", c)
+	if err, rearrivalInfo := arrivalInfoService.GetArrivalInfo(arrivalInfo.ClassesId, arrivalInfo.LocationId); err != nil {
+        //global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
+		//response.FailWithMessage("查询失败", c)
+		response.FailWithData(gin.H{"rearrivalInfo": nil}, c)
 	} else {
 		response.OkWithData(gin.H{"rearrivalInfo": rearrivalInfo}, c)
 	}

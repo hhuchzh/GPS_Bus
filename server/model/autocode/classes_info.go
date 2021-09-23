@@ -16,7 +16,7 @@ type ClassesInfo struct {
 	Remark       string   `json:"remark" form:"remark" gorm:"column:remark;comment:备注;type:varchar(100);"`
 	ClassesTime  string   `json:"classesTime" form:"classesTime" gorm:"column:classes_time;comment:发车时间;type:time);"`
 	BusId        *uint    `json:"busId" form:"busId" gorm:"column:bus_id;comment:;type:bigint"`
-	Bus          *BusInfo `gorm:"foreignKey:BusId"`
+	Bus          *BusInfo `json:"busInfo" form:"busInfo" gorm:"foreignKey:BusId"`
 }
 
 // TableName ClassesInfo 表名

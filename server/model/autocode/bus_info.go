@@ -17,7 +17,7 @@ type BusInfo struct {
 	CreateUserId *int      `json:"createUserId" form:"createUserId" gorm:"column:create_user_id;comment:创建用户id;type:bigint"`
 	UpdateUserId *int      `json:"updateUserId" form:"updateUserId" gorm:"column:update_user_id;comment:更新用户id;type:bigint"`
 	CompanyId    *int      `json:"companyId" form:"companyId" gorm:"column:company_id;comment:公司id;type:bigint"`
-	GpsInfos     []GpsInfo `gorm:"foreignKey:BusId"`
+	  GpsInfos []GpsInfo  `json:"gpsInfos" gorm:"foreignKey:BusId"`
 }
 
 // TableName BusInfo 表名

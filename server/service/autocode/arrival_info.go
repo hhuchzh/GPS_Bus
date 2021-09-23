@@ -40,8 +40,8 @@ func (arrivalInfoService *ArrivalInfoService) UpdateArrivalInfo(arrivalInfo auto
 
 // GetArrivalInfo 根据id获取ArrivalInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (arrivalInfoService *ArrivalInfoService) GetArrivalInfo(id uint) (err error, arrivalInfo autocode.ArrivalInfo) {
-	err = global.GVA_DB.Where("id = ?", id).Preload("Location").First(&arrivalInfo).Error
+func (arrivalInfoService *ArrivalInfoService)GetArrivalInfo(classId *uint, locationId *uint) (err error, arrivalInfo autocode.ArrivalInfo) {
+	err = global.GVA_DB.Where("classes_id = ? AND location_id = ?", classId, locationId).First(&arrivalInfo).Error
 	return
 }
 
