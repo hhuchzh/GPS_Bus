@@ -13,9 +13,9 @@ func (g *GpsRouter) InitGpsRouter(Router *gin.RouterGroup) {
 	gpsRouter := Router.Group("gps").Use(middleware.OperationRecord())
 	var gpsApi = v1.ApiGroupApp.GpsApiGroup.GpsApi
 	{
-		gpsRouter.GET("device", gpsApi.ListDevice)
-		gpsRouter.GET("location", gpsApi.ListLocation)
-        gpsRouter.GET("location/:imei", gpsApi.GetLocation)
-        gpsRouter.GET("track/:imei", gpsApi.ListTrack)
+		//gpsRouter.GET("device", gpsApi.ListDevice)
+		//gpsRouter.GET("location", gpsApi.ListLocation)
+        gpsRouter.GET("location", gpsApi.GetLocation)
+        gpsRouter.GET("track", gpsApi.ListTrack)
 	}
 }

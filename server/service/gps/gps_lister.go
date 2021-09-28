@@ -9,7 +9,7 @@ import (
 )
 
 const (
-    cronJobSpec = "*/15 * 7,8,9,15,16,17,18 * * *"
+    cronJobSpec = "*/15 * 7,8,9,11,15,16,17,18 * * *"
 )
 
 var (
@@ -58,17 +58,8 @@ func (g *GPSLister) ListDevice() ([]openapi.Device, error) {
     return dList, nil
 }
 
-func (g *GPSLister) ListTrack(imei, beginTime, endTime string) ([]openapi.Track, error) {
-    track, err := g.client.ListTrack(imei, beginTime, endTime)
-    if err != nil {
-        return nil, err
-    }
-
-    tList := make([]openapi.Track, 0, len(track))
-    for _, t := range track {
-        tList = append(tList, *t)
-    }
-    return tList, nil
+func (g *GPSLister) ListTrack(imei, beginTime, endTime string) (interface{}, error) {
+    return g.backend.ListTrack(imei, beginTime, endTime)
 }
 
 func (g *GPSLister) Start() {
