@@ -55,5 +55,6 @@ func openapi2model (loc openapi.Location) model.GpsDetail {
     gd.GpsTime = loc.GpsTime
     gd.Speed, _  = strconv.Atoi(loc.Speed)
     gd.Dir, _ = strconv.Atoi(loc.Direction)
+    gd.AccStatus, _ = strconv.Atoi(loc.AccStatus)
     return gd
 }

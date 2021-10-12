@@ -13,6 +13,7 @@ type GpsDetail struct {
     GpsTime string `json:"gpsTime" form:"gpsTime" gorm:"column:gps_time;comment:;type:datetime"`
     Speed int `json:"speed" form:"speed" gorm:"column:speed;comment:;type:smallint"`
     Dir int `json:"dir" form:"dir" gorm:"column:dir;comment:;type:smallint"`
+    AccStatus int `json:"accStatus" form:"accStatus" gorm:"column:acc_status;comment:;type:smallint"`
 }
 
 func (GpsDetail) TableName() string {
