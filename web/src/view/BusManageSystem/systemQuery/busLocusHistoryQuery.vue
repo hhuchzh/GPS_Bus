@@ -24,6 +24,16 @@
       </el-form>
     </div>
     <div id="container" style="width: 1600px; height: 750px;" />
+    <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" width="20%" top="15%">
+      <el-form>
+        <p style="text-align:center">没有历史轨迹数据，请重新查询</p>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="mini" type="primary" @click="closeDialog">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -60,7 +70,9 @@ export default {
       carIcon_5: null,
       carIcon_6: null,
       carIcon_7: null,
-      currentLabel: null
+      currentLabel: null,
+      timerId: null,
+      dialogFormVisible: false
     }
   },
   async created() {
@@ -121,6 +133,34 @@ export default {
       script.src = '//api.map.baidu.com/getscript?v=2.0&ak=qG1aM2UK80lGHVHKmHczRcmzBBOd8blK'
       script.onload = () => {
         console.log('script load success')
+        var BMap = window.BMap
+        this.carIcon_0 = new BMap.Icon('./images/car_0.png', new BMap.Size(48, 48))
+        this.carIcon_1 = new BMap.Icon('./images/car_1.png', new BMap.Size(48, 48))
+        this.carIcon_2 = new BMap.Icon('./images/car_2.png', new BMap.Size(48, 48))
+        this.carIcon_3 = new BMap.Icon('./images/car_3.png', new BMap.Size(48, 48))
+        this.carIcon_4 = new BMap.Icon('./images/car_4.png', new BMap.Size(48, 48))
+        this.carIcon_5 = new BMap.Icon('./images/car_5.png', new BMap.Size(48, 48))
+        this.carIcon_6 = new BMap.Icon('./images/car_6.png', new BMap.Size(48, 48))
+        this.carIcon_7 = new BMap.Icon('./images/car_7.png', new BMap.Size(48, 48))
+
+        this.currentLabel = new BMap.Label('速度:0 KM/H', {
+          offset: new BMap.Size(20, -10)
+        })
+        this.currentLabel.setStyle({
+          color: '#fff',
+          backgroundColor: '#333333',
+          border: '0',
+          fontSize: '14px',
+          width: '100px',
+          // height: '20px',
+          opacity: '0.8',
+          verticalAlign: 'center',
+          textAlign: 'center',
+          borderRadius: '2px',
+          whiteSpace: 'normal',
+          wordWrap: 'break-word',
+          padding: '5px',
+        })
       }
       document.body.appendChild(script)
 
@@ -210,7 +250,10 @@ export default {
       this.setZoom()
       this.driveline(this.points)
       this.pointIdx++
-      setTimeout(this.dynamicLine, 500)
+      if (this.timerId != null) {
+        clearTimeout(this.timerId)
+      }
+      this.timerId = setTimeout(this.dynamicLine, 500)
     },
     showHistoryPath(trackList) {
       this.transferPoint(trackList)
@@ -221,33 +264,6 @@ export default {
       this.map.enableScrollWheelZoom(true) // 开启鼠标滚轮缩放
       this.map.addControl(new BMap.NavigationControl()) // 缩放按钮
       this.currentBound = this.map.getBounds()
-      this.carIcon_0 = new BMap.Icon('car_0.png', new BMap.Size(48, 48))
-      this.carIcon_1 = new BMap.Icon('car_1.png', new BMap.Size(48, 48))
-      this.carIcon_2 = new BMap.Icon('car_2.png', new BMap.Size(48, 48))
-      this.carIcon_3 = new BMap.Icon('car_3.png', new BMap.Size(48, 48))
-      this.carIcon_4 = new BMap.Icon('car_4.png', new BMap.Size(48, 48))
-      this.carIcon_5 = new BMap.Icon('car_5.png', new BMap.Size(48, 48))
-      this.carIcon_6 = new BMap.Icon('car_6.png', new BMap.Size(48, 48))
-      this.carIcon_7 = new BMap.Icon('car_7.png', new BMap.Size(48, 48))
-
-      this.currentLabel = new window.BMap.Label('速度:' + this.pointList[this.pointIdx].speed + ' KM/H', {
-        offset: new window.BMap.Size(20, -10)
-      })
-      this.currentLabel.setStyle({
-        color: '#fff',
-        backgroundColor: '#333333',
-        border: '0',
-        fontSize: '14px',
-        width: '100px',
-        // height: '20px',
-        opacity: '0.8',
-        verticalAlign: 'center',
-        textAlign: 'center',
-        borderRadius: '2px',
-        whiteSpace: 'normal',
-        wordWrap: 'break-word',
-        padding: '5px',
-      })
       this.dynamicLine()
     },
     initParameters() {
@@ -258,6 +274,23 @@ export default {
       this.currentBound = null
       this.preMarker = null
       this.pointList = []
+      if (this.timerId != null) {
+        clearTimeout(this.timerId)
+      }
+      var el = document.getElementById('container')
+      if (el) {
+        el.style.display = 'block'
+      }
+    },
+    removeMap() {
+      var el = document.getElementById('container')
+      if (el) {
+        el.innerHTML = ''
+        el.style.display = 'none'
+      }
+    },
+    closeDialog() {
+      this.dialogFormVisible = false
     },
     // 条件搜索前端看此方法
     async onSubmit(time) {
@@ -276,6 +309,10 @@ export default {
       if (ret.code === 0 && ret.data.track.length > 0) {
         // console.log(ret.data.track)
         this.showHistoryPath(ret.data.track)
+      } else {
+        console.log('no data')
+        this.removeMap()
+        this.dialogFormVisible = true
       }
     },
   },

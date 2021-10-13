@@ -48,8 +48,17 @@ export default {
       carIcon_5: null,
       carIcon_6: null,
       carIcon_7: null,
+      carIcon_static_0: null,
+      carIcon_static_1: null,
+      carIcon_static_2: null,
+      carIcon_static_3: null,
+      carIcon_static_4: null,
+      carIcon_static_5: null,
+      carIcon_static_6: null,
+      carIcon_static_7: null,
       currentBound: null,
-      currentLabel: null
+      currentLabel: null,
+      timerId: null
     }
   },
   async created() {
@@ -95,14 +104,22 @@ export default {
       script.onload = () => {
         // this.initMap()
         var BMap = window.BMap
-        this.carIcon_0 = new BMap.Icon('car_0.png', new BMap.Size(48, 48))
-        this.carIcon_1 = new BMap.Icon('car_1.png', new BMap.Size(48, 48))
-        this.carIcon_2 = new BMap.Icon('car_2.png', new BMap.Size(48, 48))
-        this.carIcon_3 = new BMap.Icon('car_3.png', new BMap.Size(48, 48))
-        this.carIcon_4 = new BMap.Icon('car_4.png', new BMap.Size(48, 48))
-        this.carIcon_5 = new BMap.Icon('car_5.png', new BMap.Size(48, 48))
-        this.carIcon_6 = new BMap.Icon('car_6.png', new BMap.Size(48, 48))
-        this.carIcon_7 = new BMap.Icon('car_7.png', new BMap.Size(48, 48))
+        this.carIcon_0 = new BMap.Icon('./images/car_0.png', new BMap.Size(48, 48))
+        this.carIcon_1 = new BMap.Icon('./images/car_1.png', new BMap.Size(48, 48))
+        this.carIcon_2 = new BMap.Icon('./images/car_2.png', new BMap.Size(48, 48))
+        this.carIcon_3 = new BMap.Icon('./images/car_3.png', new BMap.Size(48, 48))
+        this.carIcon_4 = new BMap.Icon('./images/car_4.png', new BMap.Size(48, 48))
+        this.carIcon_5 = new BMap.Icon('./images/car_5.png', new BMap.Size(48, 48))
+        this.carIcon_6 = new BMap.Icon('./images/car_6.png', new BMap.Size(48, 48))
+        this.carIcon_7 = new BMap.Icon('./images/car_7.png', new BMap.Size(48, 48))
+        this.carIcon_static_0 = new BMap.Icon('./images/car_static_0.png', new BMap.Size(48, 48))
+        this.carIcon_static_1 = new BMap.Icon('./images/car_static_1.png', new BMap.Size(48, 48))
+        this.carIcon_static_2 = new BMap.Icon('./images/car_static_2.png', new BMap.Size(48, 48))
+        this.carIcon_static_3 = new BMap.Icon('./images/car_static_3.png', new BMap.Size(48, 48))
+        this.carIcon_static_4 = new BMap.Icon('./images/car_static_4.png', new BMap.Size(48, 48))
+        this.carIcon_static_5 = new BMap.Icon('./images/car_static_5.png', new BMap.Size(48, 48))
+        this.carIcon_static_6 = new BMap.Icon('./images/car_static_6.png', new BMap.Size(48, 48))
+        this.carIcon_static_7 = new BMap.Icon('./images/car_static_7.png', new BMap.Size(48, 48))
         this.currentLabel = new window.BMap.Label('速度: 0 KM/H', {
           offset: new window.BMap.Size(20, -10)
         })
@@ -135,25 +152,58 @@ export default {
       if (ret.code === 0) {
         const BMap = window.BMap
         var centerPoint = new BMap.Point(ret.data.location.lng, ret.data.location.lat)
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaa : ' + ret.data.location.accStatus)
         // var point = new BMap.Point(ret.data.location.lng, ret.data.location.lat)
         var marker = null
         var dir = Number(ret.data.location.dir)
         if (dir === 0 || dir === 360) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_0 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_0 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_0 })
+          }
         } else if (dir > 0 && dir < 90) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_1 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_1 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_1 })
+          }
         } else if (dir === 90) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_2 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_2 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_2 })
+          }
         } else if (dir > 90 && dir < 180) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_3 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_3 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_3 })
+          }
         } else if (dir === 180) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_4 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_4 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_4 })
+          }
         } else if (dir > 180 && dir < 270) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_5 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_5 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_5 })
+          }
         } else if (dir === 270) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_6 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_6 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_6 })
+          }
         } else if (dir > 270 && dir < 360) {
-          marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_7 })
+          if (ret.data.location.accStatus === 0) {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_7 })
+          } else {
+            marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_7 })
+          }
         }
         this.currentLabel.setContent('速度:' + ret.data.location.speed + ' KM/H')
         marker.setLabel(this.currentLabel)
@@ -164,12 +214,18 @@ export default {
         this.map.addOverlay(marker)
         // this.map.panTo(centerPoint)
         this.preMarker = marker
-        setTimeout(this.addMarker, 5000)
+        if (this.timerId != null) {
+          clearTimeout(this.timerId)
+        }
+        this.timerId = setTimeout(this.addMarker, 5000)
       }
     },
     async showRealTimePath() {
       const ret = await getLocation({ gpsSn: this.currentSelectGPSSN })
       if (ret.code === 0) {
+        if (this.timerId != null) {
+          clearTimeout(this.timerId)
+        }
         const BMap = window.BMap
         this.map = new BMap.Map('container')
         this.map.enableScrollWheelZoom(true) // 开启鼠标滚轮缩放
