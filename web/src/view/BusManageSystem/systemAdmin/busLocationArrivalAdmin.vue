@@ -96,19 +96,20 @@ export default {
     async getArrivalInfo(page = this.listdata.page, pageSize = this.listdata.pageSize) {
       var data = await getLocationInfoList({ page, pageSize, ...this.listdata.queryInfo })
       if (data.code === 0) {
-        this.listdata.tableData = data.data.list
+        // this.listdata.tableData = data.data.list
+        for (var i = 0; i < data.data.list.length; i++) {
+          this.arrivalFormData.locationId = data.data.list[i].ID
+          const res = await findArrivalInfo(this.arrivalFormData)
+          if (res.code === 0 && res.data.rearrivalInfo !== null) {
+            data.data.list[i]['arrivalTime'] = res.data.rearrivalInfo.arrivalTime
+          } else {
+            data.data.list[i]['arrivalTime'] = '-'
+          }
+        }
         this.listdata.total = data.data.total
         this.listdata.page = data.data.page
         this.listdata.pageSize = data.data.pageSize
-      }
-      for (var i = 0; i < data.data.list.length; i++) {
-        this.arrivalFormData.locationId = data.data.list[i].ID
-        const res = await findArrivalInfo(this.arrivalFormData)
-        if (res.code === 0 && res.data.rearrivalInfo !== null) {
-          this.listdata.tableData[i]['arrivalTime'] = res.data.rearrivalInfo.arrivalTime
-        } else {
-          this.listdata.tableData[i]['arrivalTime'] = '-'
-        }
+        this.listdata.tableData = data.data.list
       }
     },
     toBusRouteAdmin() {

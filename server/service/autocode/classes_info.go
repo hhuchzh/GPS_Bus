@@ -57,6 +57,10 @@ func (classesInfoService *ClassesInfoService) GetClassesInfoInfoList(info autoCo
 	if info.RouteId != nil {
 		db = db.Where("`route_id` = ?", info.RouteId)
 	}
+
+	if info.BusId != nil {
+		db = db.Where("`bus_id` = ?", info.BusId)
+	}
 	err = db.Count(&total).Error
 	err = db.Limit(limit).Offset(offset).Preload("Bus").Find(&classesInfos).Error
 	return err, classesInfos, total

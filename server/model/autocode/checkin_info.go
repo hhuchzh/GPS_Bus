@@ -16,7 +16,7 @@ type CheckinInfo struct {
 	ClassesId    *uint64      `json:"classesId" form:"classesId" gorm:"column:classes_id;comment:;type:bigint"`
 	CheckinTime  string       `json:"checkinTime" form:"checkinTime" gorm:"column:checkin_time;comment:;type:time"`
 	CheckinDate  string       `json:"checkinDate" form:"checkinDate" gorm:"column:checkin_date;comment:;type:date"`
-	Arrival      *ArrivalInfo `gorm:"foreignKey:ArrivalId"`
+	Arrival      *ArrivalInfo `json:"arrivalInfo" form:"arrivalInfo" gorm:"foreignKey:ArrivalId"`
 }
 
 // TableName CheckinInfo 表名
@@ -25,9 +25,18 @@ func (CheckinInfo) TableName() string {
 }
 
 func (checkin *CheckinInfo) AfterFind(tx *gorm.DB) (err error) {
-	err = tx.Where("id = ?", checkin.ArrivalId).Find(checkin.ArrivalId).Error
-	if checkin.Arrival != nil && err == nil {
-		err = tx.Where("id = ?", checkin.Arrival.LocationId).Find(checkin.Arrival.Location).Error
+	arrival := ArrivalInfo{}
+	location := LocationInfo{}
+	result := tx.Where("id = ?", checkin.ArrivalId).Find(&arrival)
+	
+	if result.RowsAffected != 0  && result.Error == nil {
+		checkin.Arrival = &arrival
+		result = tx.Where("id = ?", arrival.LocationId).Find(&location)
 	}
-	return err
+	
+	if result.RowsAffected != 0  && result.Error == nil {
+		arrival.Location = &location
+	}
+
+	return result.Error
 }
