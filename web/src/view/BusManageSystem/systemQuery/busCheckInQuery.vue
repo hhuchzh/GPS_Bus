@@ -202,6 +202,7 @@ export default {
     // 条件搜索前端看此方法
     onSubmit() {
       // TBD
+      this.listdata.page = 1
       this.getListData()
     },
     searchCheckIn(classID) {
