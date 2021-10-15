@@ -41,7 +41,7 @@ func (checkinInfoService *CheckinInfoService) UpdateCheckinInfo(checkinInfo auto
 // GetCheckinInfo 根据id获取CheckinInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
 func (checkinInfoService *CheckinInfoService) GetCheckinInfo(id uint) (err error, checkinInfo autocode.CheckinInfo) {
-	err = global.GVA_DB.Where("id = ?", id).First(&checkinInfo).Error
+	err = global.GVA_DB.Where("id = ?", id).Preload("Arrival").First(&checkinInfo).Error
 	return
 }
 
@@ -65,6 +65,6 @@ func (checkinInfoService *CheckinInfoService) GetCheckinInfoInfoList(info autoCo
 		db = db.Where("`checkin_date` = ?", info.CheckinDate)
 	}
 	err = db.Count(&total).Error
-	err = db.Limit(limit).Offset(offset).Find(&checkinInfos).Error
+	err = db.Limit(limit).Offset(offset).Preload("Arrival").Find(&checkinInfos).Error
 	return err, checkinInfos, total
 }

@@ -11,7 +11,7 @@ type CheckinInfo struct {
 	global.GVA_MODEL
 	CreateUserId *int         `json:"createUserId" form:"createUserId" gorm:"column:create_user_id;comment:创建人ID;type:bigint"`
 	UpdateUserId *int         `json:"updateUserId" form:"updateUserId" gorm:"column:update_user_id;comment:修改人ID;type:bigint"`
-	ArrivalId    *int         `json:"locationId" form:"locationId" gorm:"column:location_id;comment:;type:bigint"`
+	ArrivalId    *int         `json:"arrivalId" form:"arrivalId" gorm:"column:arrival_id;comment:;type:bigint"`
 	ClassesId    *uint64      `json:"classesId" form:"classesId" gorm:"column:classes_id;comment:;type:bigint"`
 	CheckinTime  string       `json:"checkinTime" form:"checkinTime" gorm:"column:checkin_time;comment:;type:time"`
 	CheckinDate  string       `json:"checkinDate" form:"checkinDate" gorm:"column:checkin_date;comment:;type:date"`
