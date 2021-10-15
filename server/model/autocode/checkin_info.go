@@ -3,6 +3,7 @@ package autocode
 
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"gorm.io/gorm"
 )
 
 // CheckinInfo 结构体
@@ -21,4 +22,12 @@ type CheckinInfo struct {
 // TableName CheckinInfo 表名
 func (CheckinInfo) TableName() string {
 	return "checkin_info"
+}
+
+func (checkin *CheckinInfo) AfterFind(tx *gorm.DB) (err error) {
+	err = tx.Where("id = ?", checkin.ArrivalId).Find(checkin.ArrivalId).Error
+	if checkin.Arrival != nil && err == nil {
+		err = tx.Where("id = ?", checkin.Arrival.LocationId).Find(checkin.Arrival.Location).Error
+	}
+	return err
 }
