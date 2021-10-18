@@ -3,7 +3,7 @@
     <div class="login_panle">
       <div class="login_panle_form">
         <div class="login_panle_form_title">
-          <img class="login_panle_form_title_logo" :src="$GIN_VUE_ADMIN.appLogo" alt=""><p class="login_panle_form_title_p">{{ $GIN_VUE_ADMIN.appName }}</p>
+          <!-- <img class="login_panle_form_title_logo" :src="$GIN_VUE_ADMIN.appLogo" alt="">--><p class="login_panle_form_title_p">研创园车辆管理系统</p>
         </div>
         <el-form
           ref="loginForm"
@@ -49,28 +49,39 @@
             </div>
           </el-form-item>
           <el-form-item>
-            <el-button
+            <!--<el-button
               type="primary"
               style="width: 46%"
               @click="checkInit"
-            >前往初始化</el-button>
+            >前往初始化</el-button> -->
             <el-button
               type="primary"
-              style="width: 46%;margin-left:8%"
+              style="width: 100%;"
               @click="submitForm"
             >登 录</el-button>
           </el-form-item>
         </el-form>
       </div>
-      <div class="login_panle_right" />
+      <div class="login_panle_right">
+        <div class="div_center">
+          <div id="advantage" class="advantage_style">
+            <div id="ad_son">
+              <div id="son_1" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_1.png"></div>
+              <div id="son_2" class="ad_son_son" style="display: block;"><img src="~@/assets/banner_2.png"></div>
+              <div id="son_3" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_3.png"></div>
+              <div id="son_4" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_4.png"></div>
+            </div><!--/ad_son-->
+          </div><!--/advantage-->
+        </div>
+      </div>
       <div class="login_panle_foot">
-        <div class="links">
+        <!-- <div class="links">
           <a href="http://doc.henrongyi.top/"><img src="@/assets/docs.png" class="link-icon"></a>
           <a href="https://www.yuque.com/flipped-aurora/"><img src="@/assets/yuque.png" class="link-icon"></a>
           <a href="https://github.com/flipped-aurora/gin-vue-admin"><img src="@/assets/github.png" class="link-icon"></a>
           <a href="https://space.bilibili.com/322210472"><img src="@/assets/video.png" class="link-icon"></a>
         </div>
-        <div class="copyright">Copyright &copy; {{ curYear }} 💖 flipped-aurora</div>
+        <div class="copyright">Copyright &copy; {{ curYear }} 💖 flipped-aurora</div> -->
       </div>
     </div>
   </div>
@@ -101,8 +112,8 @@ export default {
       curYear: 0,
       lock: 'lock',
       loginForm: {
-        username: 'admin',
-        password: '123456',
+        username: '',
+        password: '',
         captcha: '',
         captchaId: ''
       },
@@ -111,12 +122,29 @@ export default {
         password: [{ validator: checkPassword, trigger: 'blur' }]
       },
       logVerify: '',
-      picPath: ''
+      picPath: '',
+      ad_1: document.getElementById('son_1'),
+      ad_2: document.getElementById('son_2'),
+      ad_3: document.getElementById('son_3'),
+      ad_4: document.getElementById('son_4'),
+      adList: [],
+      idx: 0
     }
   },
   created() {
     this.loginVerify()
     this.curYear = new Date().getFullYear()
+  },
+  mounted() {
+    this.ad_1 = document.getElementById('son_1')
+    this.ad_2 = document.getElementById('son_2')
+    this.ad_3 = document.getElementById('son_3')
+    this.ad_4 = document.getElementById('son_4')
+    this.adList.push(this.ad_1)
+    this.adList.push(this.ad_2)
+    this.adList.push(this.ad_3)
+    this.adList.push(this.ad_4)
+    setInterval(this.changeAD, 2000)
   },
   methods: {
     ...mapActions('user', ['LoginIn']),
@@ -163,6 +191,19 @@ export default {
         this.picPath = ele.data.picPath
         this.loginForm.captchaId = ele.data.captchaId
       })
+    },
+    changeAD() {
+      for (var i = 0; i < 4; i++) {
+        if (i === this.idx) {
+          this.adList[i].style.display = 'block'
+        } else {
+          this.adList[i].style.display = 'none'
+        }
+      }
+      this.idx++
+      if (this.idx === 4) {
+        this.idx = 0
+      }
     }
   }
 }

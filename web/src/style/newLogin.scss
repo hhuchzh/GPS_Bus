@@ -19,11 +19,34 @@
     align-items: center;
     justify-content: space-evenly;
     .login_panle_right{
-      background-image: url("~@/assets/login_left.svg");
+      background:#ff8700;
+      background-image: url("~@/assets/banner_bg.png");
+      background-repeat:no-repeat;
+	    background-position:top center;
+	    background-attachment:fixed;
       background-size: cover;
-      width: 40%;
+      width: 70%;
       height: 60%;
       float: right !important;
+    }
+    .div_center {
+      width:960px;
+      margin:0 auto;
+      float:none;
+    }
+    .advantage_style {
+      width:960px;
+      height:540px;
+    }
+    .ad_son {
+      width:960px;
+      height:500px;
+      overflow:hidden;
+    }
+    .ad_son_son {
+      width:160px;
+      height:500px;
+      float:left;
     }
     .login_panle_form{
       width: 420px;

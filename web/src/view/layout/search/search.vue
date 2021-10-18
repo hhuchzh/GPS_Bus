@@ -1,6 +1,6 @@
 <template>
   <div class="search-component">
-    <transition name="el-fade-in-linear">
+    <!--<transition name="el-fade-in-linear">
       <div v-show="show" class="transition-box" style="display: inline-block; ">
         <el-select
           ref="search-input"
@@ -18,16 +18,16 @@
           />
         </el-select>
       </div>
-    </transition>
+    </transition>-->
     <div
       :style="{display:'inline-block',float:'right',width:'31px',textAlign:'left',fontSize:'16px',paddingTop:'2px'}"
       class="user-box"
     >
       <i :style="{cursor:'pointer',paddingLeft:'1px'}" class="el-icon-refresh reload" :class="[reload ? 'reloading' : '']" @click="handleReload" />
     </div>
-    <div :style="{display:'inline-block',float:'right'}" class="user-box">
+    <!--<div :style="{display:'inline-block',float:'right'}" class="user-box">
       <i :style="{cursor:'pointer'}" class="el-icon-search search-icon" @click="showSearch()" />
-    </div>
+    </div>-->
   </div>
 </template>
 
