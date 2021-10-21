@@ -13,7 +13,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="日期:" prop="time">
-          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" clearable autocomplete="off" value-format="YYYY-MM-DD" />
+          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" type="date" :disabled-date="disabledDate" value-format="YYYY-MM-DD" />
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
@@ -21,6 +21,31 @@
         </el-form-item>
       </el-form>
     </div>
+    <!--result of table -->
+    <el-table ref="busInfoList" :data="listdata.tableData" border stripe @sort-change="sortChange">
+      <el-table-column label="车牌号" prop="busPlate" min-width="100" sortable="custom" align="center" />
+      <el-table-column label="路线名称" prop="routeName" min-width="200" sortable="custom" align="center" />
+      <el-table-column label="班次ID" prop="ID" min-width="100" sortable="custom" align="center" />
+      <el-table-column label="发车时间" prop="classesTime" min-width="100" sortable="custom" align="center" />
+      <el-table-column label="里程数" prop="busMileage" min-width="100" sortable="custom" align="center" />
+      <!--edit&del button -->
+      <el-table-column fixed="right" label="操作" min-width="200" align="center">
+        <template #default="scope">
+          <el-button size="mini" type="primary" icon="el-icon-search" class="table-button" @click="searchCheckIn(scope.row.ID)">打卡查询</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!--pages -->
+    <el-pagination
+      layout="total, sizes, prev, pager, next, jumper"
+      :current-page="listdata.page"
+      :page-size="pageSize"
+      :page-sizes="[10, 30, 50, 100]"
+      :style="{float:'right',padding:'20px'}"
+      :total="listdata.total"
+      @current-change="handleCurrentChangeList"
+      @size-change="handleSizeChangeList"
+    />
   </div>
 </template>
 
@@ -39,6 +64,15 @@ export default {
       currentSelectedPlate: '',
       currentSelectGPSSN: '',
       currentSelectedDate: this.getNowFormatDate(),
+      listdata: {
+        page: 1,
+        total: 10,
+        pageSize: 10,
+        tableData: [],
+        queryInfo: {
+          busId: parseInt(this.currentSelectedID)
+        }
+      },
     }
   },
   async created() {
@@ -61,7 +95,11 @@ export default {
         this.listdata.total = data.data.total
         this.listdata.tableData = data.data.list
       }
-    }, */
+    },*/
+    disabledDate(date) {
+      // alert('date')
+      return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
+    },
     async getBusInfos() {
       const res = await getBusInfoList()
       if (res.code === 0) {
@@ -90,6 +128,8 @@ export default {
     },
     getNowFormatDate() {
       var date = new Date()
+      date = date - 1000 * 60 * 60 * 24
+      date = new Date(date)
       var seperator1 = '-'
       var year = date.getFullYear()
       var month = date.getMonth() + 1

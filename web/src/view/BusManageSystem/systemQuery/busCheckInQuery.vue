@@ -13,10 +13,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="日期:" prop="time">
-          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" clearable autocomplete="off" value-format="YYYY-MM-DD" />
+          <!--<el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" clearable autocomplete="off" value-format="YYYY-MM-DD" />-->
+          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledDate" />
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile">导出上月打卡</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -143,6 +145,10 @@ export default {
         this.listdata.tableData = data.data.list
       }
     },
+    disabledDate(date) {
+      // alert('date')
+      return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
+    },
     handleSizeChangeList(val) {
       this.listdata.pageSize = val
       this.getListData()
@@ -186,6 +192,8 @@ export default {
     },
     getNowFormatDate() {
       var date = new Date()
+      date = date - 1000 * 60 * 60 * 24
+      date = new Date(date)
       var seperator1 = '-'
       var year = date.getFullYear()
       var month = date.getMonth() + 1

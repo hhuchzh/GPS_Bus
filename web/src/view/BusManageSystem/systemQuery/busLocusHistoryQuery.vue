@@ -13,7 +13,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="日期:" prop="time">
-          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" clearable autocomplete="off" value-format="YYYY-MM-DD" />
+          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" type="date" :disabled-date="disabledDate" value-format="YYYY-MM-DD" />
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit('morning')">早高峰查询</el-button>
@@ -97,6 +97,10 @@ export default {
         }
       }
     },
+    disabledDate(date) {
+      // alert('date')
+      return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
+    },
     changeOption(event) {
       this.currentSelectedID = event
       this.getBusInfo()
@@ -114,6 +118,8 @@ export default {
     },
     getNowFormatDate() {
       var date = new Date()
+      date = date - 1000 * 60 * 60 * 24
+      date = new Date(date)
       var seperator1 = '-'
       var year = date.getFullYear()
       var month = date.getMonth() + 1
