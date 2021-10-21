@@ -4,7 +4,8 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/core"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
-    _ "github.com/flipped-aurora/gin-vue-admin/server/service/gps"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/checkin"
+	_ "github.com/flipped-aurora/gin-vue-admin/server/service/gps"
 )
 
 //go:generate go env -w GO111MODULE=on
@@ -30,5 +31,7 @@ func main() {
 		db, _ := global.GVA_DB.DB()
 		defer db.Close()
 	}
+
+	checkin.Init()
 	core.RunWindowsServer()
 }
