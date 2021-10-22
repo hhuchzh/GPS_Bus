@@ -16,7 +16,7 @@
           <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledStartDate" />
         </el-form-item>
         <el-form-item label="结束时间:" prop="endTime">
-          <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledEndDate" />
+          <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledEndDate" @change="changeStartFormatDate" />
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile('checkin')">导出打卡数据</el-button>
@@ -68,7 +68,7 @@ export default {
     },*/
     disabledStartDate(date) {
       var endDate = new Date(this.currentSelectedEndDate)
-      return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 30) || (date.getTime() > endDate)
+      return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 31) || (date.getTime() > endDate)
     },
     disabledEndDate(date) {
       // alert('date')
@@ -140,6 +140,24 @@ export default {
       }
       var currentdate = year + seperator1 + month + seperator1 + strDate
       return currentdate
+    },
+    changeStartFormatDate() {
+      var date = this.currentSelectedEndDate
+      date = new Date(date)
+      date = date - 1000 * 60 * 60 * 24 * 30
+      date = new Date(date)
+      var seperator1 = '-'
+      var year = date.getFullYear()
+      var month = date.getMonth() + 1
+      var strDate = date.getDate()
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = '0' + strDate
+      }
+      this.currentSelectedStartDate = year + seperator1 + month + seperator1 + strDate
+      console.log(this.currentSelectedStartDate)
     },
     downLoadFile(type) {
       // TBD
