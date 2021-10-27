@@ -121,18 +121,18 @@ export default {
         this.carIcon_static_6 = new BMap.Icon('./images/car_static_6.png', new BMap.Size(48, 48))
         this.carIcon_static_7 = new BMap.Icon('./images/car_static_7.png', new BMap.Size(48, 48))
         this.currentLabel = new window.BMap.Label('速度: 0 KM/H', {
-          offset: new window.BMap.Size(20, -10)
+          offset: new window.BMap.Size(35, -75)
         })
         this.currentLabel.setStyle({
           color: '#fff',
           backgroundColor: '#333333',
           border: '0',
           fontSize: '14px',
-          width: '100px',
-          height: '20px',
+          width: '200px',
+          height: '80px',
           opacity: '0.8',
           verticalAlign: 'center',
-          textAlign: 'center',
+          textAlign: 'left',
           borderRadius: '2px',
           whiteSpace: 'normal',
           wordWrap: 'break-word',
@@ -156,56 +156,83 @@ export default {
         // var point = new BMap.Point(ret.data.location.lng, ret.data.location.lat)
         var marker = null
         var dir = Number(ret.data.location.dir)
+        var accStatus = '关'
         if (dir === 0 || dir === 360) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_0 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_0 })
+            accStatus = '开'
           }
         } else if (dir > 0 && dir < 90) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_1 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_1 })
+            accStatus = '开'
           }
         } else if (dir === 90) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_2 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_2 })
+            accStatus = '开'
           }
         } else if (dir > 90 && dir < 180) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_3 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_3 })
+            accStatus = '开'
           }
         } else if (dir === 180) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_4 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_4 })
+            accStatus = '开'
           }
         } else if (dir > 180 && dir < 270) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_5 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_5 })
+            accStatus = '开'
           }
         } else if (dir === 270) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_6 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_6 })
+            accStatus = '开'
           }
         } else if (dir > 270 && dir < 360) {
           if (ret.data.location.accStatus === 0) {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_7 })
+            accStatus = '关'
           } else {
             marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_7 })
+            accStatus = '开'
           }
         }
-        this.currentLabel.setContent('速度:' + ret.data.location.speed + ' KM/H')
+        var str = '速度: ' + ret.data.location.speed + ' KM/H'
+        str += '<br>'
+        str += 'IMEI : ' + this.currentSelectGPSSN
+        str += '<br>'
+        str += 'ACC : ' + accStatus
+        str += '<br>'
+        str += '定位时间 : ' + this.getNowDate()
+        str += '<br>'
+
+        // this.currentLabel.setContent('速度:' + ret.data.location.speed + ' KM/H')
+        this.currentLabel.setContent(str)
         marker.setLabel(this.currentLabel)
         this.setZoom(centerPoint)
         if (this.preMarker != null) {
@@ -219,6 +246,17 @@ export default {
         }
         this.timerId = setTimeout(this.addMarker, 5000)
       }
+    },
+    getNowDate() {
+      var myDate = new Date()
+      var year = myDate.getFullYear()
+      var mon = myDate.getMonth() + 1
+      var date = myDate.getDate()
+      var hours = myDate.getHours()
+      var minutes = myDate.getMinutes()
+      var seconds = myDate.getSeconds()
+      var now = year + '-' + mon + '-' + date + ' ' + hours + ':' + minutes + ':' + seconds
+      return now
     },
     async showRealTimePath() {
       const ret = await getLocation({ gpsSn: this.currentSelectGPSSN })

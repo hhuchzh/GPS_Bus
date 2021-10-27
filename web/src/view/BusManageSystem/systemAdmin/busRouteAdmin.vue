@@ -45,7 +45,7 @@
         <template #default="scope">
           <el-button size="mini" type="primary" icon="el-icon-edit" @click="updateRouteInfo(scope.row)">修改路线</el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteRow(scope.row)">删除路线</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="toBusRouteLocationAdmin(scope.row.ID)">查询站点</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-edit" @click="toBusRouteLocationAdmin(scope.row.ID)">编辑站点</el-button>
           <el-button size="mini" type="success" icon="el-icon-search" @click="toBusClassAdmin(scope.row.ID, scope.row.routeName)">查看班次</el-button>
         </template>
       </el-table-column>
