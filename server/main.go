@@ -5,6 +5,7 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
 	"github.com/flipped-aurora/gin-vue-admin/server/service/checkin"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/mileage"
 	_ "github.com/flipped-aurora/gin-vue-admin/server/service/gps"
 )
 
@@ -33,5 +34,6 @@ func main() {
 	}
 
 	checkin.Init()
+    mileage.Init()
 	core.RunWindowsServer()
 }
