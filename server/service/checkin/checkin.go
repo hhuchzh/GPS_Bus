@@ -38,17 +38,15 @@ type checkin interface {
 }
 
 func getDistance(lat1, lat2, lng1, lng2 float64) (float64, error) {
-	radius := 6371000.0
+	radius := 6371000.0 //6378137.0
 	rad := math.Pi / 180.0
 	lat1 = lat1 * rad
-	lat2 = lat2 * rad
 	lng1 = lng1 * rad
+	lat2 = lat2 * rad
 	lng2 = lng2 * rad
-	theat := lng2 - lng2
-
-	deltaS := math.Acos(math.Sin(lat1)*math.Sin(lat2) + math.Cos(lat1)*math.Cos(lat2)*math.Cos(theat))
-
-	return deltaS * radius, nil
+	theta := lng2 - lng1
+	dist := math.Acos(math.Sin(lat1)*math.Sin(lat2) + math.Cos(lat1)*math.Cos(lat2)*math.Cos(theta))
+	return dist * radius, nil
 }
 
 type CheckinMonitor struct {
@@ -78,63 +76,63 @@ func NewMonitor() *CheckinMonitor {
 
 }
 
-// func (monitor *CheckinMonitor) Run() {
-// 	global.GVA_LOG.Info("Create checkin monitor...")
-
-// 	list, cnt, err := monitor.loadClassses()
-// 	if err != nil {
-// 		global.GVA_LOG.Error("load classes failure", zap.Error(err))
-// 		return
-// 	}
-// 	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
-
-// 	classes, ok := list.([]autocode.ClassesInfo)
-// 	if !ok {
-// 		global.GVA_LOG.Error("convert to ClassesInfo failure")
-// 		return
-// 	}
-
-// 	for _, classInfo := range classes {
-// 		monitor.monitorClasses(&classInfo)
-// 	}
-
-// 	if err != nil {
-// 		fmt.Println("GPSLister Start crontab failed: ", err)
-// 		return
-// 	}
-// 	//monitor.cron.Start()
-
-// }
-
-// Run xxx
 func (monitor *CheckinMonitor) Run() {
 	global.GVA_LOG.Info("Create checkin monitor...")
-	_, err := monitor.cron.AddFunc(cronJobSpec, func() {
-		list, cnt, err := monitor.loadClassses()
-		if err != nil {
-			global.GVA_LOG.Error("load classes failure", zap.Error(err))
-			return
-		}
-		global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
 
-		classes, ok := list.([]autocode.ClassesInfo)
-		if !ok {
-			global.GVA_LOG.Error("convert to ClassesInfo failure")
-			return
-		}
+	list, cnt, err := monitor.loadClassses()
+	if err != nil {
+		global.GVA_LOG.Error("load classes failure", zap.Error(err))
+		return
+	}
+	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
 
-		for _, classInfo := range classes {
-			monitor.monitorClasses(&classInfo)
-		}
+	classes, ok := list.([]autocode.ClassesInfo)
+	if !ok {
+		global.GVA_LOG.Error("convert to ClassesInfo failure")
+		return
+	}
 
-	})
+	for _, classInfo := range classes {
+		monitor.monitorClasses(&classInfo)
+	}
+
 	if err != nil {
 		fmt.Println("GPSLister Start crontab failed: ", err)
 		return
 	}
-	monitor.cron.Start()
+	//monitor.cron.Start()
 
 }
+
+// Run xxx
+// func (monitor *CheckinMonitor) Run() {
+// 	global.GVA_LOG.Info("Create checkin monitor...")
+// 	_, err := monitor.cron.AddFunc(cronJobSpec, func() {
+// 		list, cnt, err := monitor.loadClassses()
+// 		if err != nil {
+// 			global.GVA_LOG.Error("load classes failure", zap.Error(err))
+// 			return
+// 		}
+// 		global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
+
+// 		classes, ok := list.([]autocode.ClassesInfo)
+// 		if !ok {
+// 			global.GVA_LOG.Error("convert to ClassesInfo failure")
+// 			return
+// 		}
+
+// 		for _, classInfo := range classes {
+// 			monitor.monitorClasses(&classInfo)
+// 		}
+
+// 	})
+// 	if err != nil {
+// 		fmt.Println("GPSLister Start crontab failed: ", err)
+// 		return
+// 	}
+// 	monitor.cron.Start()
+
+// }
 
 func (monitor *CheckinMonitor) monitorClasses(classes *autocode.ClassesInfo) {
 	global.GVA_LOG.Debug("monitor classes start")
@@ -209,9 +207,12 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 	var bSuccess bool
 	var gps gps.GpsDetail
+	var gpsTime time.Time
 	for _, gps = range gpsList {
 		curLng, _ := strconv.ParseFloat(arrival.Location.Longtitude, 64)
 		curLat, _ := strconv.ParseFloat(arrival.Location.Latitude, 64)
+		stringSlice := strings.Split(gps.GpsTime, "T")
+		gpsTime, _ = time.Parse("2006-01-02 15:04:05", stringSlice[0]+" "+strings.Split(stringSlice[1], "+")[0])
 
 		src := checkinMeta{
 			lng: curLng,
@@ -222,19 +223,18 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 		dst := checkinMeta{
 			lng: gps.Lng,
 			lat: gps.Lat,
-			t:   end,
+			t:   gpsTime,
 		}
+
 		bSuccess = monitor.verify.verifyCheckin(&src, &dst)
 		if bSuccess {
-
 			break
 		}
 	}
 
 	if bSuccess {
 		global.GVA_LOG.Info("checkin success")
-		gpsT, _ := time.Parse("2006-01-02 15:04:05", gps.GpsTime)
-		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, gpsT.Format("15:04:05"), date)
+		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, gpsTime.Format("15:04:05"), date)
 	} else {
 		global.GVA_LOG.Info("can not find checkin")
 		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", date)
