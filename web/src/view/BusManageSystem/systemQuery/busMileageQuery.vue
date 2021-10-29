@@ -17,7 +17,7 @@
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile">导出上月里程</el-button>
+          <!--<el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile">导出上月里程</el-button>-->
         </el-form-item>
       </el-form>
     </div>
@@ -27,13 +27,13 @@
       <el-table-column label="路线名称" prop="routeName" min-width="200" sortable="custom" align="center" />
       <el-table-column label="班次ID" prop="ID" min-width="100" sortable="custom" align="center" />
       <el-table-column label="发车时间" prop="classesTime" min-width="100" sortable="custom" align="center" />
-      <el-table-column label="里程数" prop="busMileage" min-width="100" sortable="custom" align="center" />
-      <!--edit&del button -->
+      <el-table-column label="里程数(KM)" prop="distance" min-width="100" sortable="custom" align="center" />
+      <!--edit&del button
       <el-table-column fixed="right" label="操作" min-width="200" align="center">
         <template #default="scope">
           <el-button size="mini" type="primary" icon="el-icon-search" class="table-button" @click="searchCheckIn(scope.row.ID)">打卡查询</el-button>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
     <!--pages -->
     <el-pagination
@@ -54,6 +54,15 @@ import {
   findBusInfo,
   getBusInfoList
 } from '@/api/bus_info'
+import {
+  getClassesInfoList
+} from '@/api/classes_info'
+import {
+  getMilesInfoList
+} from '@/api/miles_info'
+import {
+  findRouteInfo
+} from '@/api/route_info'
 // import infoList from '@/mixins/infoList'
 // import { toSQLLine } from '@/utils/stringFun'
 export default {
@@ -79,7 +88,7 @@ export default {
     this.getBusInfos()
   },
   methods: {
-    /* async getListData(page = this.listdata.page, pageSize = this.listdata.pageSize) {
+    async getListData(page = this.listdata.page, pageSize = this.listdata.pageSize) {
       var data = await getClassesInfoList({ page, pageSize, busId: parseInt(this.currentSelectedID) })
       if (data.code === 0) {
         for (var idx = 0; idx < data.data.list.length; idx++) {
@@ -89,13 +98,33 @@ export default {
           if (ret.code === 0) {
             data.data.list[idx]['routeName'] = ret.data.rerouteInfo.routeName
           }
+          var res = await getMilesInfoList({ classesId: parseInt(data.data.list[idx].ID), calcDate: this.currentSelectedDate })
+          if (res.code === 0) {
+            data.data.list[idx]['distance'] = this.getDistance(res.data.list[0].distance)
+          }
         }
         this.listdata.page = data.data.page
         this.listdata.pageSize = data.data.pageSize
         this.listdata.total = data.data.total
         this.listdata.tableData = data.data.list
       }
-    },*/
+    },
+    handleSizeChangeList(val) {
+      this.listdata.pageSize = val
+      this.getListData()
+    },
+    handleCurrentChangeList(val) {
+      this.listdata.page = val
+      this.getListData()
+    },
+    getDistance(data) {
+      var tmp = Math.floor(data * 100) / 100000
+      if (tmp > 0) {
+        return tmp.toPrecision(4)
+      } else {
+        return tmp
+      }
+    },
     disabledDate(date) {
       // alert('date')
       return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
@@ -147,6 +176,7 @@ export default {
     onSubmit() {
       // TBD
       this.listdata.page = 1
+      this.getListData()
     },
   },
 }

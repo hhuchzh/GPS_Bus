@@ -18,7 +18,7 @@
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile">导出上月打卡</el-button>
+          <!--<el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile">导出上月打卡</el-button>-->
         </el-form-item>
       </el-form>
     </div>
