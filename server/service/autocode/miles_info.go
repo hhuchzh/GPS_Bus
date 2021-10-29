@@ -20,7 +20,7 @@ func (s *MilesInfoService) GetMilesInfoList(info autoCodeReq.MilesInfoSearch) (e
 	}
 
 	if info.CalcDate != "" {
-		db = db.Where("`calc_date` = ?", info.CalcDate)
+		db = db.Where("`cal_date` = ?", info.CalcDate)
 	}
 	err = db.Count(&total).Error
 	//err = db.Limit(limit).Offset(offset).Preload("Arrival").Find(&checkinInfos).Error
