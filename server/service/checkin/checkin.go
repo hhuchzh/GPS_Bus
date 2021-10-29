@@ -76,63 +76,63 @@ func NewMonitor() *CheckinMonitor {
 
 }
 
-func (monitor *CheckinMonitor) Run() {
-	global.GVA_LOG.Info("Create checkin monitor...")
-
-	list, cnt, err := monitor.loadClassses()
-	if err != nil {
-		global.GVA_LOG.Error("load classes failure", zap.Error(err))
-		return
-	}
-	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
-
-	classes, ok := list.([]autocode.ClassesInfo)
-	if !ok {
-		global.GVA_LOG.Error("convert to ClassesInfo failure")
-		return
-	}
-
-	for _, classInfo := range classes {
-		monitor.monitorClasses(&classInfo)
-	}
-
-	if err != nil {
-		fmt.Println("GPSLister Start crontab failed: ", err)
-		return
-	}
-	//monitor.cron.Start()
-
-}
-
-// Run xxx
 // func (monitor *CheckinMonitor) Run() {
 // 	global.GVA_LOG.Info("Create checkin monitor...")
-// 	_, err := monitor.cron.AddFunc(cronJobSpec, func() {
-// 		list, cnt, err := monitor.loadClassses()
-// 		if err != nil {
-// 			global.GVA_LOG.Error("load classes failure", zap.Error(err))
-// 			return
-// 		}
-// 		global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
 
-// 		classes, ok := list.([]autocode.ClassesInfo)
-// 		if !ok {
-// 			global.GVA_LOG.Error("convert to ClassesInfo failure")
-// 			return
-// 		}
+// 	list, cnt, err := monitor.loadClassses()
+// 	if err != nil {
+// 		global.GVA_LOG.Error("load classes failure", zap.Error(err))
+// 		return
+// 	}
+// 	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
 
-// 		for _, classInfo := range classes {
-// 			monitor.monitorClasses(&classInfo)
-// 		}
+// 	classes, ok := list.([]autocode.ClassesInfo)
+// 	if !ok {
+// 		global.GVA_LOG.Error("convert to ClassesInfo failure")
+// 		return
+// 	}
 
-// 	})
+// 	for _, classInfo := range classes {
+// 		monitor.monitorClasses(&classInfo)
+// 	}
+
 // 	if err != nil {
 // 		fmt.Println("GPSLister Start crontab failed: ", err)
 // 		return
 // 	}
-// 	monitor.cron.Start()
+// 	//monitor.cron.Start()
 
 // }
+
+// Run xxx
+func (monitor *CheckinMonitor) Run() {
+	global.GVA_LOG.Info("Create checkin monitor...")
+	_, err := monitor.cron.AddFunc(cronJobSpec, func() {
+		list, cnt, err := monitor.loadClassses()
+		if err != nil {
+			global.GVA_LOG.Error("load classes failure", zap.Error(err))
+			return
+		}
+		global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
+
+		classes, ok := list.([]autocode.ClassesInfo)
+		if !ok {
+			global.GVA_LOG.Error("convert to ClassesInfo failure")
+			return
+		}
+
+		for _, classInfo := range classes {
+			monitor.monitorClasses(&classInfo)
+		}
+
+	})
+	if err != nil {
+		fmt.Println("GPSLister Start crontab failed: ", err)
+		return
+	}
+	monitor.cron.Start()
+
+}
 
 func (monitor *CheckinMonitor) monitorClasses(classes *autocode.ClassesInfo) {
 	global.GVA_LOG.Debug("monitor classes start")
