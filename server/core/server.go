@@ -21,6 +21,7 @@ func RunWindowsServer() {
 	Router := initialize.Routers()
 
 	Router.Static("/form-generator", "./resource/page")
+	Router.Static("/admin", "./resource/dist")
 
 	address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
 	s := initServer(address, Router)
@@ -30,12 +31,7 @@ func RunWindowsServer() {
 	global.GVA_LOG.Info("server run success on ", zap.String("address", address))
 
 	fmt.Printf(`
-	欢迎使用 github.com/flipped-aurora/gin-vue-admin/server
-	当前版本:V2.4.5 alpha
-    加群方式:微信号：shouzi_1994 QQ群：622360840
-	默认自动化文档地址:http://127.0.0.1%s/swagger/index.html
-	默认前端文件运行地址:http://127.0.0.1:8080
-	如果项目让您获得了收益，希望您能请团队喝杯可乐:https://www.github.com/flipped-aurora/gin-vue-admin/server.com/docs/coffee
+	欢迎使用 研创园车辆管理系统 
 `, address)
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
 }
