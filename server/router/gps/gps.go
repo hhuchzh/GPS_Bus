@@ -16,6 +16,7 @@ func (g *GpsRouter) InitGpsRouter(Router *gin.RouterGroup) {
 		//gpsRouter.GET("device", gpsApi.ListDevice)
 		//gpsRouter.GET("location", gpsApi.ListLocation)
         gpsRouter.GET("location", gpsApi.GetLocation)
+        gpsRouter.GET("locationlist", gpsApi.ListLocation)
         gpsRouter.GET("track", gpsApi.ListTrack)
 	}
 }
