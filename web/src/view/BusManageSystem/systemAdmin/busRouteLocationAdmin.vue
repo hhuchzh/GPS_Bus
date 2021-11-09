@@ -50,7 +50,15 @@
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle">
       <el-form ref="busRouteLocationForm" :inline="true" :model="formData" label-position="right" label-width="100px" :rules="rules">
         <el-form-item min-width="150" label="站点名称:" prop="locationName">
-          <el-input v-model="formData.locationName" clearable placeholder="站点名称" autocomplete="off" />
+          <!--<el-input v-model="formData.locationName" clearable placeholder="站点名称" autocomplete="off" />-->
+          <el-select v-model="formData.locationName" placeholder="请选择站点名称" @change="changeOption($event)">
+            <el-option
+              v-for="item in locationCommonList"
+              :key="item.ID"
+              :label="item.locationName"
+              :value="`${item.longtitude}-${item.latitude}-${item.locationName}`"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item min-width="150" label="经度:" prop="longtitude">
           <el-input v-model="formData.longtitude" clearable placeholder="经度" autocomplete="off" />
@@ -84,6 +92,9 @@ import {
   findLocationInfo,
   getLocationInfoList
 } from '@/api/location_info' //  此处请自行替换地址
+import {
+  getLocationCommonList
+} from '@/api/location_common'
 import infoList from '@/mixins/infoList'
 import { toSQLLine } from '@/utils/stringFun'
 export default {
@@ -110,14 +121,34 @@ export default {
         latitude: [{ required: true, message: '请输入纬度', trigger: 'blur' }],
         orderNo: [{ required: true, message: '请输入位于站数', trigger: 'blur' }],
       },
+      locationCommonList: [],
+      currentSelectLocation: ''
     }
   },
   async created() {
     this.searchInfo.routeId = parseInt(this.$route.query.ID)
     await this.getTableData()
+    this.getLocationCommonList()
   },
   methods: {
-  // 条件搜索前端看此方法
+    async getLocationCommonList() {
+      const ret = await getLocationCommonList()
+      if (ret.code === 0) {
+        this.locationCommonList = ret.data.list
+        // this.formData.locationName = ret.date.list[0].locationName
+      }
+    },
+    changeOption(event) {
+      if (event) {
+        var arr = event.split('-')
+        if (arr.length === 3) {
+          this.formData.longtitude = arr[0]
+          this.formData.latitude = arr[1]
+          this.formData.locationName = arr[2]
+        }
+      }
+    },
+    // 条件搜索前端看此方法
     toBusRouteAdmin() {
       this.$router.push({ path: './busRouteAdmin' })
     },
