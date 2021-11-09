@@ -111,3 +111,11 @@ export const getAvailableGpsInfoList = (params) => {
     params
   })
 }
+
+export const getNotAvailableGpsInfoList = (params) => {
+  return service({
+    url: '/gpsInfo/getNotAvailableGpsInfoList',
+    method: 'get',
+    params
+  })
+}

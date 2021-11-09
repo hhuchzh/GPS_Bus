@@ -16,3 +16,11 @@ export const track = (params) => {
   })
 }
 
+export const locationlist = (params) => {
+  return service({
+    url: '/gps/locationlist',
+    method: 'get',
+    params
+  })
+}
+

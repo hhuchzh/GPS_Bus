@@ -21,5 +21,6 @@ func (s *GpsInfoRouter) InitGpsInfoRouter(Router *gin.RouterGroup) {
 		gpsInfoRouter.GET("findGpsInfo", gpsInfoApi.FindGpsInfo)                         // 根据ID获取GpsInfo
 		gpsInfoRouter.GET("getGpsInfoList", gpsInfoApi.GetGpsInfoList)                   // 获取GpsInfo列表
 		gpsInfoRouter.GET("getAvailableGpsInfoList", gpsInfoApi.GetAvailableGpsInfoList) // 获取GpsInfo列表
+		gpsInfoRouter.GET("getNotAvailableGpsInfoList", gpsInfoApi.GetNotAvailableGpsInfoList) // 获取GpsInfo列表
 	}
 }

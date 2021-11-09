@@ -153,7 +153,23 @@ func (gpsInfoApi *GpsInfoApi) GetGpsInfoList(c *gin.Context) {
 func (gpsInfoApi *GpsInfoApi) GetAvailableGpsInfoList(c *gin.Context) {
 	var pageInfo autocodeReq.GpsInfoSearch
 	_ = c.ShouldBindQuery(&pageInfo)
-	if err, list, total := gpsInfoService.GetAvailableGpsInfoInfoList(pageInfo); err != nil {
+	if err, list, total := gpsInfoService.GetAvailableGpsInfoList(pageInfo); err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
+
+func (gpsInfoApi *GpsInfoApi) GetNotAvailableGpsInfoList(c *gin.Context) {
+	var pageInfo autocodeReq.GpsInfoSearch
+	_ = c.ShouldBindQuery(&pageInfo)
+	if err, list, total := gpsInfoService.GetNotAvailableGpsInfoList(pageInfo); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
 		response.FailWithMessage("获取失败", c)
 	} else {

@@ -2,24 +2,34 @@
   <div>
     <div class="search-term">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
-        <el-form-item label="车牌号:" prop="busId">
-          <el-select v-model="currentSelectedPlate" placeholder="请选择车牌号" @change="changeOption($event)">
+        <el-form-item label="路线:" prop="routeId">
+          <el-select v-model="currnetSelectRouteName" placeholder="请选择路线" @change="changeRouteListOption($event)">
             <el-option
-              v-for="item in busInfoList"
-              :key="item.busPlate"
-              :label="item.busPlate"
+              v-for="item in routeList"
+              :key="item.routeName"
+              :label="item.routeName"
               :value="item.ID"
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="日期:" prop="time">
-          <el-date-picker v-model="currentSelectedDate" placeholder="请选择日期" type="date" :disabled-date="disabledDate" value-format="YYYY-MM-DD" />
+        <el-form-item label="班次:" prop="classId">
+          <el-select v-model="currnetSelectClassName" placeholder="请选择班次" @change="changeClassListOption($event)">
+            <el-option
+              v-for="item in classList"
+              :key="item.remark"
+              :label="item.remark"
+              :value="item.busId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开始时间:" prop="startTime">
+          <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledDate" value-format="YYYY-MM-DD HH:mm:ss" />
+        </el-form-item>
+        <el-form-item label="结束时间:" prop="EndTime">
+          <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledDate" value-format="YYYY-MM-DD HH:mm:ss" />
         </el-form-item>
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit('morning')">早高峰查询</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit('afternoon')">晚高峰查询</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit()">历史轨迹查询</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -40,21 +50,27 @@
 <script>
 // import BMapGL from 'BMapGL'
 import {
-  findBusInfo,
-  getBusInfoList
-} from '@/api/bus_info' //  此处请自行替换地址
+  getRouteInfoList
+} from '@/api/route_info' //  此处请自行替换地址
+import {
+  getClassesInfoList
+} from '@/api/classes_info'
 import {
   track
 } from '@/api/gpsQuery' //  此处请自行替换地址
+import {
+  findBusInfo
+} from '@/api/bus_info' //  此处请自行替换地址\
+import {
+  getArrivalInfoList
+} from '@/api/arrival_info'
 export default {
   data() {
     return {
       map: {},
-      busInfoList: [],
-      currentSelectedID: -1,
-      currentSelectedPlate: '',
       currentSelectGPSSN: '',
-      currentSelectedDate: this.getNowFormatDate(),
+      currentSelectedStartDate: this.getNowDate(),
+      currentSelectedEndDate: this.getNowDate(),
       preMarker: null,
       pointIdx: 0,
       pointList: [],
@@ -72,28 +88,74 @@ export default {
       carIcon_7: null,
       currentLabel: null,
       timerId: null,
-      dialogFormVisible: false
+      dialogFormVisible: false,
+      currnetSelectRouteId: -1,
+      currnetSelectRouteName: '',
+      routeList: [],
+      currnetSelectBusId: -1,
+      currnetSelectClassName: '',
+      classList: [],
+      currentSelectClassId: -1,
+      locationPointsList: [],
+      prePoint: null
     }
   },
   async created() {
-    this.getBusInfos()
+    this.getRouteInfo()
   },
   mounted() {
     this.loadJScript()
   },
   methods: {
-    async getBusInfos() {
-      const res = await getBusInfoList()
+    async getRouteInfo() {
+      const res = await getRouteInfoList()
       if (res.code === 0) {
-        this.busInfoList = res.data.list
-        // console.log(this.busInfoList.length)
-        if (this.busInfoList && this.busInfoList.length > 0) {
-          this.currentSelectedPlate = this.busInfoList[0].busPlate
-          this.currentSelectedID = this.busInfoList[0].ID
-          this.getBusInfo()
+        console.log(res)
+        this.routeList = res.data.list
+        if (this.routeList && this.routeList.length > 0) {
+          this.currnetSelectRouteName = this.routeList[0].routeName
+          this.currnetSelectRouteId = this.routeList[0].ID
+          this.getClassInfo(this.currnetSelectRouteId)
         } else {
-          this.currentSelectedPlate = ''
-          this.currentSelectedID = -1
+          this.currnetSelectRouteName = ''
+          this.currnetSelectRouteId = -1
+        }
+      }
+    },
+    async getClassInfo(routeId) {
+      const res = await getClassesInfoList({ routeId: parseInt(routeId) })
+      if (res.code === 0) {
+        this.classList = res.data.list
+        if (this.classList && this.classList.length > 0) {
+          this.currnetSelectClassName = this.classList[0].remark
+          this.currnetSelectBusId = this.classList[0].busId
+          this.currentSelectClassId = this.classList[0].ID
+          this.getBusInfo()
+          // this.getArrivalInfoList()
+        } else {
+          this.currnetSelectClassName = ''
+          this.currnetSelectBusId = -1
+        }
+      }
+    },
+    changeRouteListOption(event) {
+      console.log(event)
+      this.getClassInfo(event)
+    },
+    changeClassListOption(event) {
+      // TBD
+      console.log(event)
+      this.currnetSelectBusId = event
+      this.getBusInfo()
+    },
+    async getBusInfo() {
+      const res = await findBusInfo({ ID: this.currnetSelectBusId })
+      // console.log(res)
+      // console.log(res.data)
+      if (res.code === 0) {
+        if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
+          this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
+          console.log(this.currentSelectGPSSN)
         }
       }
     },
@@ -101,37 +163,31 @@ export default {
       // alert('date')
       return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
     },
-    changeOption(event) {
-      this.currentSelectedID = event
-      this.getBusInfo()
-    },
-    async getBusInfo() {
-      const res = await findBusInfo({ ID: this.currentSelectedID })
-      // console.log(res)
-      // console.log(res.data)
-      if (res.code === 0) {
-        if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
-          this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
-          // console.log('getBusInfo : ' + this.currentSelectGPSSN)
-        }
+    getNowDate() {
+      var myDate = new Date()
+      var year = myDate.getFullYear()
+      var mon = myDate.getMonth() + 1
+      var date = myDate.getDate()
+      var hours = myDate.getHours()
+      var minutes = myDate.getMinutes()
+      var seconds = myDate.getSeconds()
+      if (mon >= 1 && mon <= 9) {
+        mon = '0' + mon
       }
-    },
-    getNowFormatDate() {
-      var date = new Date()
-      date = date - 1000 * 60 * 60 * 24
-      date = new Date(date)
-      var seperator1 = '-'
-      var year = date.getFullYear()
-      var month = date.getMonth() + 1
-      var strDate = date.getDate()
-      if (month >= 1 && month <= 9) {
-        month = '0' + month
+      if (date >= 0 && date <= 9) {
+        date = '0' + date
       }
-      if (strDate >= 0 && strDate <= 9) {
-        strDate = '0' + strDate
+      if (hours >= 0 && hours <= 9) {
+        hours = '0' + hours
       }
-      var currentdate = year + seperator1 + month + seperator1 + strDate
-      return currentdate
+      if (minutes >= 0 && minutes <= 9) {
+        minutes = '0' + minutes
+      }
+      if (seconds >= 0 && seconds <= 9) {
+        seconds = '0' + seconds
+      }
+      var now = year + '-' + mon + '-' + date + ' ' + hours + ':' + minutes + ':' + seconds
+      return now
     },
     loadJScript() {
       var script = document.createElement('script')
@@ -207,6 +263,29 @@ export default {
         strokeOpacity: 1
       }))
     },
+    driveline1(startPoint, endPoint) {
+      var polyline
+      var map = this.map
+      var options = {
+        onSearchComplete: function(results) {
+          if (driving.getStatus() === 0) {
+            // 获取第一条方案
+            var plan = results.getPlan(0)
+            // 获取方案的驾车线路
+            var route = plan.getRoute(0)
+            var points = route.getPath()
+            polyline = new window.BMap.Polyline(points, {
+              strokeColor: '#00ff00',
+              strokeWeight: 4,
+              strokeOpacity: 1
+            })
+            map.addOverlay(polyline)
+          }
+        }
+      }
+      var driving = new window.BMap.DrivingRoute(this.map, options)
+      driving.search(startPoint, endPoint)
+    },
     // 根据点信息实时更新地图显示范围，让轨迹完整显示。设置新的中心点和显示级别
     setZoom() {
       if (this.currentBound.containsPoint(this.centerPoint) === false) {
@@ -249,12 +328,18 @@ export default {
       }
       this.currentLabel.setContent('速度:' + this.pointList[this.pointIdx].speed + ' KM/H')
       mkr.setLabel(this.currentLabel)
-      this.map.addOverlay(mkr) // 标点
-      this.preMarker = mkr
       this.points.push(this.arrPoints[this.pointIdx])
       this.centerPoint = this.arrPoints[this.pointIdx]
       this.setZoom()
       this.driveline(this.points)
+      /* if (this.prePoint === null) {
+        this.prePoint = this.arrPoints[this.pointIdx]
+      }
+      this.driveline(this.prePoint, this.arrPoints[this.pointIdx])
+      this.prePoint = this.arrPoints[this.pointIdx]
+      */
+      this.map.addOverlay(mkr) // 标点
+      this.preMarker = mkr
       this.pointIdx++
       if (this.timerId != null) {
         clearTimeout(this.timerId)
@@ -270,6 +355,7 @@ export default {
       this.map.enableScrollWheelZoom(true) // 开启鼠标滚轮缩放
       this.map.addControl(new BMap.NavigationControl()) // 缩放按钮
       this.currentBound = this.map.getBounds()
+      this.getArrivalInfoList()
       this.dynamicLine()
     },
     initParameters() {
@@ -301,17 +387,8 @@ export default {
     // 条件搜索前端看此方法
     async onSubmit(time) {
       this.initParameters()
-      var beginTime = ''
-      var endTime = ''
-      if (time === 'morning') {
-        beginTime = this.currentSelectedDate + ' 07:00:00'
-        endTime = this.currentSelectedDate + ' 11:00:00'
-      } else if (time === 'afternoon') {
-        beginTime = this.currentSelectedDate + ' 15:00:00'
-        endTime = this.currentSelectedDate + ' 18:00:00'
-      }
-      // console.log('beginTime : ' + beginTime + '/ endTime : ' + endTime)
-      const ret = await track({ gpsSn: this.currentSelectGPSSN, beginTime: beginTime, endTime: endTime })
+      console.log('gps : ' + this.currentSelectGPSSN + '/ startTime : ' + this.currentSelectedStartDate + '/ endTime : ' + this.currentSelectedEndDate)
+      const ret = await track({ gpsSn: this.currentSelectGPSSN, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate })
       if (ret.code === 0 && ret.data.track.length > 0) {
         // console.log(ret.data.track)
         this.showHistoryPath(ret.data.track)
@@ -319,6 +396,45 @@ export default {
         console.log('no data')
         this.removeMap()
         this.dialogFormVisible = true
+      }
+    },
+    async getArrivalInfoList() {
+      var data = await getArrivalInfoList({ classesId: this.currentSelectClassId })
+      console.log(data)
+      if (data.code === 0) {
+        this.map.clearOverlays()
+        this.locationPointsList = []
+        for (var i = 0; i < data.data.list.length; i++) {
+          if (data.data.list[i].Location) {
+            this.locationPointsList.push(new window.BMap.Point(data.data.list[i].Location.longtitude, data.data.list[i].Location.latitude))
+            var locationMarker = new window.BMap.Marker(this.locationPointsList[i])
+            this.map.addOverlay(locationMarker)
+          }
+        }
+        var polyline
+        var map = this.map
+        var options = {
+          onSearchComplete: function(results) {
+            if (driving.getStatus() === 0) {
+              // 获取第一条方案
+              var plan = results.getPlan(0)
+              // 获取方案的驾车线路
+              var route = plan.getRoute(0)
+              var points = route.getPath()
+              polyline = new window.BMap.Polyline(points, {
+                strokeColor: 'red',
+                strokeWeight: 2,
+                strokeOpacity: 1,
+                strokeStyle: 'dashed'
+              })
+              map.addOverlay(polyline)
+            }
+          }
+        }
+        var driving = new window.BMap.DrivingRoute(this.map, options)
+        for (var j = 0; j < this.locationPointsList.length - 1; j++) {
+          driving.search(this.locationPointsList[j], this.locationPointsList[j + 1])
+        }
       }
     },
   },

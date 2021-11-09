@@ -68,7 +68,7 @@ func (gpsInfoService *GpsInfoService) GetGpsInfoInfoList(info autoCodeReq.GpsInf
 
 // GetAvailableGpsInfoInfoList 分页获取可用GpsInfo记录
 // Author [piexlmax](https://github.com/piexlmax)
-func (gpsInfoService *GpsInfoService) GetAvailableGpsInfoInfoList(info autoCodeReq.GpsInfoSearch) (err error, list interface{}, total int64) {
+func (gpsInfoService *GpsInfoService) GetAvailableGpsInfoList(info autoCodeReq.GpsInfoSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
 	// 创建db
@@ -76,6 +76,20 @@ func (gpsInfoService *GpsInfoService) GetAvailableGpsInfoInfoList(info autoCodeR
 	var gpsInfos []autocode.GpsInfo
 
 	db = db.Where("`bus_id` = ?", -1)
+
+	err = db.Count(&total).Error
+	err = db.Limit(limit).Offset(offset).Find(&gpsInfos).Error
+	return err, gpsInfos, total
+}
+
+func (gpsInfoService *GpsInfoService) GetNotAvailableGpsInfoList(info autoCodeReq.GpsInfoSearch) (err error, list interface{}, total int64) {
+	limit := info.PageSize
+	offset := info.PageSize * (info.Page - 1)
+	// 创建db
+	db := global.GVA_DB.Model(&autocode.GpsInfo{})
+	var gpsInfos []autocode.GpsInfo
+
+	db = db.Where("`bus_id` != ?", -1)
 
 	err = db.Count(&total).Error
 	err = db.Limit(limit).Offset(offset).Find(&gpsInfos).Error
