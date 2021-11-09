@@ -3,19 +3,13 @@
     <div class="search-term">
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
         <!-- GPS名字&序列号-->
-        <el-form-item label="GPS名字">
-          <el-input v-model="searchInfo.gpsName" placeholder="GPS名字" />
-        </el-form-item>
-        <el-form-item label="GPS序列号">
-          <el-input v-model="searchInfo.gpsSn" placeholder="GPS序列号" />
-        </el-form-item>
-        <el-form-item label="车辆ID">
-          <el-input v-model="searchInfo.busId" placeholder="车辆ID" />
+        <el-form-item label="站点名">
+          <el-input v-model="searchInfo.locationName" placeholder="站点名" />
         </el-form-item>
         <!-- query&add button -->
         <el-form-item>
-          <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询GPS</el-button>
-          <el-button size="mini" type="primary" icon="el-icon-plus" @click="openDialog('add')">新增GPS</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit">查询站点</el-button>
+          <el-button size="mini" type="primary" icon="el-icon-plus" @click="openDialog('add')">新增站点</el-button>
           <el-popover v-model:visible="deleteVisible" placement="top" width="160">
             <p>确定要删除吗？</p>
             <div style="text-align: right; margin: 0">
@@ -31,21 +25,17 @@
       </el-form>
     </div>
     <!-- details -->
-    <el-table ref="GPSInfoList" :data="tableData" border stripe @sort-change="sortChange" @selection-change="handleSelectionChange">
+    <el-table ref="locationInfoList" :data="tableData" border stripe @sort-change="sortChange" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="100" />
-      <el-table-column label="GPSID" prop="ID" width="200" sortable="custom" align="center" />
-      <el-table-column label="GPS序列号" prop="gpsSn" width="300" sortable="custom" align="center" />
-      <el-table-column label="GPS名字" prop="gpsName" width="300" sortable="custom" align="center" />
-      <el-table-column label="车辆ID" prop="busId" width="300" sortable="custom" align="center">
-        <template #default="scope">
-          <span>{{ setBusID(scope.row.busId) }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="ID" prop="ID" width="100" sortable="custom" align="center" />
+      <el-table-column label="站点名" prop="locationName" width="300" sortable="custom" align="center" />
+      <el-table-column label="经度" prop="longtitude" width="300" sortable="custom" align="center" />
+      <el-table-column label="纬度" prop="latitude" width="300" sortable="custom" align="center" />
       <!-- edit&del button -->
       <el-table-column fixed="right" label="操作" min-width="200" align="center">
         <template #default="scope">
-          <el-button size="small" type="primary" icon="el-icon-edit" class="table-button" @click="updateGpsInfo(scope.row)">编辑GPS</el-button>
-          <el-button size="small" type="danger" icon="el-icon-delete" @click="deleteRow(scope.row)">删除GPS</el-button>
+          <el-button size="small" type="primary" icon="el-icon-edit" class="table-button" @click="updateLocationCommon(scope.row)">编辑站点</el-button>
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="deleteRow(scope.row)">删除站点</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -62,16 +52,16 @@
     />
     <!-- add&edit popup-->
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle">
-      <el-form ref="gpsInfoForm" :model="formData" label-position="right" label-width="100px" :rules="rules" :inline="true">
-        <el-form-item label="GPS序列号:" prop="gpsSn">
-          <el-input v-model="formData.gpsSn" clearable placeholder="GPS序列号" autocomplete="off" />
+      <el-form ref="locationInfoForm" :model="formData" label-position="right" label-width="100px" :rules="rules" :inline="true">
+        <el-form-item label="站点名:" prop="locationName">
+          <el-input v-model="formData.locationName" clearable placeholder="请输入站点名" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="GPS名字:" prop="gpsName">
-          <el-input v-model="formData.gpsName" clearable placeholder="GPS名字" autocomplete="off" />
+        <el-form-item label="经度:" prop="longtitude">
+          <el-input v-model="formData.longtitude" clearable placeholder="请输入经度" autocomplete="off" />
         </el-form-item>
-        <!--<el-form-item label="车辆ID:" prop="busPlate">
-          <el-input v-model.number="formData.busId" clearable placeholder="车辆ID" autocomplete="off" />
-        </el-form-item>-->
+        <el-form-item label="纬度:" prop="latitude">
+          <el-input v-model="formData.latitude" clearable placeholder="请输入纬度" autocomplete="off" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -85,33 +75,34 @@
 
 <script>
 import {
-  createGpsInfo,
-  deleteGpsInfo,
-  deleteGpsInfoByIds,
-  updateGpsInfo,
-  findGpsInfo,
-  getGpsInfoList
-} from '@/api/gps_info' //  此处请自行替换地址
+  createLocationCommon,
+  deleteLocationCommon,
+  deleteLocationCommonByIds,
+  updateLocationCommon,
+  findLocationCommon,
+  getLocationCommonList
+} from '@/api/location_common'
 import infoList from '@/mixins/infoList'
 import { toSQLLine } from '@/utils/stringFun'
 export default {
-  name: 'GpsInfo',
+  name: 'LocationCommon',
   mixins: [infoList],
   data() {
     return {
-      listApi: getGpsInfoList,
+      listApi: getLocationCommonList,
       dialogFormVisible: false,
       type: '',
       deleteVisible: false,
       multipleSelection: [],
       formData: {
-        gpsSn: '',
-        gpsName: '',
-        busId: -1,
+        locationName: '',
+        longtitude: '',
+        latitude: ''
       },
       rules: {
-        gpsSn: [{ required: true, message: '请输入GPS序列号', trigger: 'blur' }],
-        gpsName: [{ required: true, message: '请输入GPS名字', trigger: 'blur' }],
+        locationName: [{ required: true, message: '请输入站点名', trigger: 'blur' }],
+        longtitude: [{ required: true, message: '请输入经度', trigger: 'blur' }],
+        latitude: [{ required: true, message: '请输入纬度', trigger: 'blur' }]
       },
     }
   },
@@ -119,19 +110,10 @@ export default {
     await this.getTableData()
   },
   methods: {
-    setBusID(busId) {
-      if (busId === -1) {
-        return '-'
-      }
-      return busId
-    },
     // 条件搜索前端看此方法
     onSubmit() {
       this.page = 1
       this.pageSize = 10
-      /* if (this.formData.busId === 0) {
-        this.formData.busId = -1
-      }*/
       this.getTableData()
     },
     handleSelectionChange(val) {
@@ -150,7 +132,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.deleteGpsInfo(row)
+        this.deleteLocationCommon(row)
       })
     },
     async onDelete() {
@@ -166,7 +148,7 @@ export default {
         this.multipleSelection.map(item => {
           ids.push(item.ID)
         })
-      const res = await deleteGpsInfoByIds({ ids })
+      const res = await deleteLocationCommonByIds({ ids })
       if (res.code === 0) {
         this.$message({
           type: 'success',
@@ -180,11 +162,11 @@ export default {
       }
     },
     initForm() {
-      this.$refs.gpsInfoForm.resetFields()
+      this.$refs.locationInfoForm.resetFields()
       this.formData = {
-        gpsSn: '',
-        gpsName: '',
-        busId: -1,
+        locationName: '',
+        longtitude: '',
+        latitude: '',
       }
     },
     closeDialog() {
@@ -194,10 +176,10 @@ export default {
     openDialog(type) {
       switch (type) {
         case 'add':
-          this.dialogTitle = '新增路线'
+          this.dialogTitle = '新增站点'
           break
         case 'edit':
-          this.dialogTitle = '修改路线'
+          this.dialogTitle = '修改站点'
           break
         default:
           break
@@ -205,15 +187,15 @@ export default {
       this.type = type
       this.dialogFormVisible = true
     },
-    async updateGpsInfo(row) {
-      const res = await findGpsInfo({ ID: row.ID })
+    async updateLocationCommon(row) {
+      const res = await findLocationCommon({ ID: row.ID })
       if (res.code === 0) {
-        this.formData = res.data.regpsInfo
+        this.formData = res.data.relocationCommon
         this.openDialog('edit')
       }
     },
-    async deleteGpsInfo(row) {
-      const res = await deleteGpsInfo({ ID: row.ID })
+    async deleteLocationCommon(row) {
+      const res = await deleteLocationCommon({ ID: row.ID })
       if (res.code === 0) {
         this.$message({
           type: 'success',
@@ -227,11 +209,12 @@ export default {
     },
     async enterDialog() {
       let res
-      this.$refs.gpsInfoForm.validate(async valid => {
+      this.$refs.locationInfoForm.validate(async valid => {
         if (valid) {
           switch (this.type) {
             case 'add':
-              res = await createGpsInfo(this.formData)
+              console.log(this.formData)
+              res = await createLocationCommon(this.formData)
               if (res.code === 0) {
                 this.$message({
                   type: 'success',
@@ -242,7 +225,7 @@ export default {
               }
               break
             case 'edit':
-              res = await updateGpsInfo(this.formData)
+              res = await updateLocationCommon(this.formData)
               if (res.code === 0) {
                 this.$message({
                   type: 'success',
@@ -253,7 +236,7 @@ export default {
               }
               break
             default:
-              res = await createGpsInfo(this.formData)
+              res = await createLocationCommon(this.formData)
               break
           }
         }

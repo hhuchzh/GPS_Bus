@@ -172,10 +172,17 @@ export default {
       var currentdate = year + seperator1 + month + seperator1 + strDate
       return currentdate
     },
+    initParameter() {
+      this.listdata.page = 1
+      this.listdata.pageSize = 10
+      this.listdata.total = 10
+      this.listdata.tableData = []
+    },
     // 条件搜索前端看此方法
     onSubmit() {
       // TBD
-      this.listdata.page = 1
+      // this.listdata.page = 1
+      this.initParameter()
       this.getListData()
     },
   },
