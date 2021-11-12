@@ -1,21 +1,21 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 )
 
 type PricePart struct {
-    StartTime int // 8
-    EndTime int // 20
-    Price float64 // 0.5
-    Unit int // minute 15
-    Max int //minute 6 * 60
+	StartTime int     // 8
+	EndTime   int     // 20
+	Price     float64 // 0.5
+	Unit      int     // minute 15
+	Max       int     //minute 6 * 60
 }
 
 type PriceStandard struct {
-    FreeTime int // minute 15
-    Day PricePart
-    Night PricePart
+	FreeTime int // minute 15
+	Day      PricePart
+	Night    PricePart
 }
 
 type priceConfig struct {
@@ -43,74 +43,148 @@ func (pc *priceConfig) Init() {
 	ps := make(map[string]PriceStandard)
 	ps["小型车"] = PriceStandard{
 		FreeTime: 15,
-        Day: PricePart{
-            StartTime: 8,
-            EndTime: 20,
-            Price: 0.5,
-            Unit: 15,
-            Max: 345,
-        },
-        Night: PricePart{
-            StartTime: 20,
-            EndTime: 8,
-            Price: 1,
-            Unit: 60,
-            Max: 345,
-        },
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     0.5,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1,
+			Unit:      60,
+			Max:       345,
+		},
 	}
 	ps["大型车"] = PriceStandard{
 		FreeTime: 15,
-        Day: PricePart{
-            StartTime: 8,
-            EndTime: 20,
-            Price: 1.5,
-            Unit: 15,
-            Max: 345,
-        },
-        Night: PricePart{
-            StartTime: 20,
-            EndTime: 8,
-            Price: 1.5,
-            Unit: 60,
-            Max: 345,
-        },
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     1.5,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1.5,
+			Unit:      60,
+			Max:       345,
+		},
 	}
 	pc.config["三级区域公共停车场"] = ps
-	
+
 	ps = make(map[string]PriceStandard)
 	ps["小型车"] = PriceStandard{
 		FreeTime: 15,
-        Day: PricePart{
-            StartTime: 8,
-            EndTime: 20,
-            Price: 1,
-            Unit: 15,
-            Max: 345,
-        },
-        Night: PricePart{
-            StartTime: 20,
-            EndTime: 8,
-            Price: 1,
-            Unit: 60,
-            Max: 345,
-        },
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     1,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1,
+			Unit:      60,
+			Max:       345,
+		},
 	}
 	ps["大型车"] = PriceStandard{
 		FreeTime: 15,
-        Day: PricePart{
-            StartTime: 8,
-            EndTime: 20,
-            Price: 2,
-            Unit: 15,
-            Max: 345,
-        },
-        Night: PricePart{
-            StartTime: 20,
-            EndTime: 8,
-            Price: 1.5,
-            Unit: 60,
-            Max: 345,
-        },
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     2,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1.5,
+			Unit:      60,
+			Max:       345,
+		},
 	}
 	pc.config["二级区域公共停车场"] = ps
+
+	ps = make(map[string]PriceStandard)
+	ps["小型车"] = PriceStandard{
+		FreeTime: 15,
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     1.5,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1,
+			Unit:      60,
+			Max:       345,
+		},
+	}
+	ps["大型车"] = PriceStandard{
+		FreeTime: 15,
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     2.5,
+			Unit:      15,
+			Max:       345,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1.5,
+			Unit:      60,
+			Max:       345,
+		},
+	}
+	pc.config["一级区域公共停车场"] = ps
+
+	ps = make(map[string]PriceStandard)
+	ps["小型车"] = PriceStandard{
+		FreeTime: 15,
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     2,
+			Unit:      15,
+			Max:       705,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1,
+			Unit:      60,
+			Max:       705,
+		},
+	}
+	ps["大型车"] = PriceStandard{
+		FreeTime: 15,
+		Day: PricePart{
+			StartTime: 8,
+			EndTime:   20,
+			Price:     3,
+			Unit:      15,
+			Max:       705,
+		},
+		Night: PricePart{
+			StartTime: 20,
+			EndTime:   8,
+			Price:     1.5,
+			Unit:      60,
+			Max:       705,
+		},
+	}
+	pc.config["核心区域公共停车场"] = ps
 }
