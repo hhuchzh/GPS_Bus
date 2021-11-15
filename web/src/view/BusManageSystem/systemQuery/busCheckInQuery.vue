@@ -102,7 +102,7 @@ export default {
       currentSelectedDate: this.getNowFormatDate(),
       listdata: {
         page: 1,
-        total: 10,
+        total: 0,
         pageSize: 10,
         tableData: [],
         queryInfo: {
@@ -112,7 +112,7 @@ export default {
       dialogFormVisible: false,
       locationListdata: {
         page: 1,
-        total: 10,
+        total: 0,
         pageSize: 10,
         tableData: [],
         queryInfo: {

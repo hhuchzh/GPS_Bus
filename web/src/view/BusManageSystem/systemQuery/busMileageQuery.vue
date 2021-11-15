@@ -75,7 +75,7 @@ export default {
       currentSelectedDate: this.getNowFormatDate(),
       listdata: {
         page: 1,
-        total: 10,
+        total: 0,
         pageSize: 10,
         tableData: [],
         queryInfo: {
@@ -175,7 +175,7 @@ export default {
     initParameter() {
       this.listdata.page = 1
       this.listdata.pageSize = 10
-      this.listdata.total = 10
+      this.listdata.total = 0
       this.listdata.tableData = []
     },
     // 条件搜索前端看此方法

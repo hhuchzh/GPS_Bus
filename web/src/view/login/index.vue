@@ -1,92 +1,90 @@
 <template>
-  <div id="userLayout">
-    <div class="login_panle">
-      <div class="login_panle_form">
-        <div class="login_panle_form_title">
-          <!-- <img class="login_panle_form_title_logo" :src="$GIN_VUE_ADMIN.appLogo" alt="">--><p class="login_panle_form_title_p">研创园车辆管理系统</p>
-        </div>
+  <div class="loginback">
+    <div class="login-bg">
+      <div class="login">
+        <h1 class="logo-login">
+          <img src="~@/assets/title.png" width="318" height="81" alt="Tracker">
+        </h1>
         <el-form
           ref="loginForm"
           :model="loginForm"
           :rules="rules"
           @keyup.enter="submitForm"
         >
-          <el-form-item prop="username">
-            <el-input v-model="loginForm.username" placeholder="请输入用户名">
-              <template #suffix>
-                <i class="el-input__icon el-icon-user" />
-              </template>
-            </el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              :type="lock === 'lock' ? 'password' : 'text'"
-              placeholder="请输入密码"
-            >
-              <template #suffix>
-                <i
-                  :class="'el-input__icon el-icon-' + lock"
-                  @click="changeLock"
-                />
-              </template>
-            </el-input>
-          </el-form-item>
-          <el-form-item style="position: relative">
-            <el-input
-              v-model="loginForm.captcha"
-              name="logVerify"
-              placeholder="请输入验证码"
-              style="width: 60%"
-            />
-            <div class="vPic">
-              <img
-                v-if="picPath"
-                :src="picPath"
-                alt="请输入验证码"
-                @click="loginVerify()"
-              >
+          <div>
+            <div class="form-group form-username">
+              <el-form-item prop="username">
+                <el-input v-model="loginForm.username" placeholder="请输入用户名">
+                  <template #suffix>
+                    <i class="el-input__icon el-icon-user" />
+                  </template>
+                </el-input>
+              </el-form-item>
             </div>
-          </el-form-item>
-          <el-form-item>
-            <!--<el-button
-              type="primary"
-              style="width: 46%"
-              @click="checkInit"
-            >前往初始化</el-button> -->
-            <el-button
-              type="primary"
-              style="width: 100%;"
-              @click="submitForm"
-            >登 录</el-button>
-          </el-form-item>
+            <div class="form-group form-password">
+              <el-form-item prop="password">
+                <el-input
+                  v-model="loginForm.password"
+                  :type="lock === 'lock' ? 'password' : 'text'"
+                  placeholder="请输入密码"
+                >
+                  <template #suffix>
+                    <i
+                      :class="'el-input__icon el-icon-' + lock"
+                      @click="changeLock"
+                    />
+                  </template>
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="form-group form-username">
+              <el-form-item style="position: relative">
+                <el-input
+                  v-model="loginForm.captcha"
+                  name="logVerify"
+                  placeholder="请输入验证码"
+                  style="width: 60%"
+                />
+                <div class="vPic">
+                  <img
+                    v-if="picPath"
+                    :src="picPath"
+                    alt="请输入验证码"
+                    @click="loginVerify()"
+                  >
+                </div>
+              </el-form-item>
+            </div>
+            <div class="form-group">
+              <el-form-item>
+                <el-button
+                  type="primary"
+                  style="width: 100%;"
+                  @click="submitForm"
+                >登 录</el-button>
+              </el-form-item>
+            </div>
+          </div>
         </el-form>
+        <span class="mappin">
+          <i class="shenzhen" />
+          <i class="beijing" />
+          <i class="dubai" />
+          <i class="canberra" />
+          <i class="washington" />
+          <i class="losangeles" />
+          <i class="santiago" />
+        </span>
       </div>
-      <div class="login_panle_right">
-        <div class="div_center">
-          <div id="advantage" class="advantage_style">
-            <div id="ad_son">
-              <div id="son_1" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_1.png"></div>
-              <div id="son_2" class="ad_son_son" style="display: block;"><img src="~@/assets/banner_2.png"></div>
-              <div id="son_3" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_3.png"></div>
-              <div id="son_4" class="ad_son_son" style="display: none;"><img src="~@/assets/banner_4.png"></div>
-            </div><!--/ad_son-->
-          </div><!--/advantage-->
+      <footer class="footer" data-automation="footer">
+        <div class="copyright ta-c">
+          © 2021 研创园车辆管理系统
+          <a href="https://beian.miit.gov.cn" target="_blank">粤ICP备15058697号</a>
         </div>
-      </div>
-      <div class="login_panle_foot">
-        <!-- <div class="links">
-          <a href="http://doc.henrongyi.top/"><img src="@/assets/docs.png" class="link-icon"></a>
-          <a href="https://www.yuque.com/flipped-aurora/"><img src="@/assets/yuque.png" class="link-icon"></a>
-          <a href="https://github.com/flipped-aurora/gin-vue-admin"><img src="@/assets/github.png" class="link-icon"></a>
-          <a href="https://space.bilibili.com/322210472"><img src="@/assets/video.png" class="link-icon"></a>
-        </div>
-        <div class="copyright">Copyright &copy; {{ curYear }} 💖 flipped-aurora</div> -->
-      </div>
+      </footer>
     </div>
   </div>
 </template>
-
 <script>
 import { mapActions } from 'vuex'
 import { captcha } from '@/api/user'
@@ -136,7 +134,7 @@ export default {
     this.curYear = new Date().getFullYear()
   },
   mounted() {
-    this.ad_1 = document.getElementById('son_1')
+    /* this.ad_1 = document.getElementById('son_1')
     this.ad_2 = document.getElementById('son_2')
     this.ad_3 = document.getElementById('son_3')
     this.ad_4 = document.getElementById('son_4')
@@ -144,7 +142,7 @@ export default {
     this.adList.push(this.ad_2)
     this.adList.push(this.ad_3)
     this.adList.push(this.ad_4)
-    setInterval(this.changeAD, 2000)
+    setInterval(this.changeAD, 2000)*/
   },
   methods: {
     ...mapActions('user', ['LoginIn']),
@@ -210,5 +208,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style/newLogin.scss";
+@import "@/style/logincss.scss";
 </style>
