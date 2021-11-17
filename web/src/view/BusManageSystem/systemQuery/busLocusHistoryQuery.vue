@@ -303,16 +303,6 @@ export default {
       }
     },
     dynamicLine() {
-      if (this.pointIdx === this.arrPoints.length) {
-        var view = this.map.getViewport(this.points)
-        var centerPoint = view.center
-        this.map.centerAndZoom(centerPoint, 13)
-        return
-      }
-      /* var label = new window.BMap.Label(this.arrPoints[this.pointIdx].lng, {
-        offset: new window.BMap.Size(20, -10)
-      })
-      mkr.setLabel(label)*/
       if (this.preMarker != null) {
         this.map.removeOverlay(this.preMarker)
       }
@@ -341,15 +331,18 @@ export default {
       this.centerPoint = this.arrPoints[this.pointIdx]
       this.setZoom()
       this.driveline(this.points)
-      /* if (this.prePoint === null) {
-        this.prePoint = this.arrPoints[this.pointIdx]
-      }
-      this.driveline(this.prePoint, this.arrPoints[this.pointIdx])
-      this.prePoint = this.arrPoints[this.pointIdx]
-      */
+      // console.log(mkr)
       this.map.addOverlay(mkr) // 标点
       this.preMarker = mkr
       this.pointIdx++
+
+      if (this.pointIdx >= this.arrPoints.length) {
+        var view = this.map.getViewport(this.points)
+        var centerPoint = view.center
+        this.map.centerAndZoom(centerPoint, 13)
+        return
+      }
+
       if (this.timerId != null) {
         clearTimeout(this.timerId)
       }
@@ -364,6 +357,7 @@ export default {
       this.map.enableScrollWheelZoom(true) // 开启鼠标滚轮缩放
       this.map.addControl(new BMap.NavigationControl()) // 缩放按钮
       this.currentBound = this.map.getBounds()
+      this.map.clearOverlays()
       this.getArrivalInfoList()
       this.dynamicLine()
     },
@@ -429,7 +423,6 @@ export default {
       var data = await getArrivalInfoList({ classesId: this.currentSelectClassId })
       console.log(data)
       if (data.code === 0) {
-        this.map.clearOverlays()
         this.locationPointsList = []
         for (var i = 0; i < data.data.list.length; i++) {
           if (data.data.list[i].Location) {
