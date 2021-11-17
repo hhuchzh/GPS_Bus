@@ -23,10 +23,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开始时间:" prop="startTime">
-          <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledDate" value-format="YYYY-MM-DD HH:mm:ss" />
+          <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledStartDate" value-format="YYYY-MM-DD HH:mm:ss" />
         </el-form-item>
         <el-form-item label="结束时间:" prop="EndTime">
-          <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledDate" value-format="YYYY-MM-DD HH:mm:ss" />
+          <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" type="datetime" :disabled-date="disabledEndDate" value-format="YYYY-MM-DD HH:mm:ss" />
         </el-form-item>
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-search" @click="onSubmit()">历史轨迹查询</el-button>
@@ -36,7 +36,7 @@
     <div id="container" style="width: 1600px; height: 750px;" />
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" width="20%" top="15%">
       <el-form>
-        <p style="text-align:center">没有历史轨迹数据，请重新查询</p>
+        <p style="text-align:center"><!--没有历史轨迹数据，请重新查询-->{{ popupMsg }}</p>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -97,7 +97,8 @@ export default {
       classList: [],
       currentSelectClassId: -1,
       locationPointsList: [],
-      prePoint: null
+      prePoint: null,
+      popupMsg: ''
     }
   },
   async created() {
@@ -159,9 +160,17 @@ export default {
         }
       }
     },
+    disabledStartDate(date) {
+      var endDate = new Date(this.currentSelectedEndDate)
+      return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 31) || (date.getTime() > endDate)
+    },
+    disabledEndDate(date) {
+      // alert('date')
+      return date.getTime() > Date.now()
+    },
     disabledDate(date) {
       // alert('date')
-      return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
+      return date.getTime() > Date.now()
     },
     getNowDate() {
       var myDate = new Date()
@@ -384,10 +393,27 @@ export default {
     closeDialog() {
       this.dialogFormVisible = false
     },
+    checkSameDate() {
+      var startDate = new Date(this.currentSelectedStartDate)
+      var endDate = new Date(this.currentSelectedEndDate)
+      if (startDate.getFullYear() === endDate.getFullYear() &&
+         startDate.getMonth() === endDate.getMonth() &&
+         startDate.getDate() === endDate.getDate()) {
+        return true
+      } else {
+        return false
+      }
+    },
     // 条件搜索前端看此方法
-    async onSubmit(time) {
+    async onSubmit() {
       this.initParameters()
       console.log('gps : ' + this.currentSelectGPSSN + '/ startTime : ' + this.currentSelectedStartDate + '/ endTime : ' + this.currentSelectedEndDate)
+      if (this.checkSameDate() === false) {
+        this.removeMap()
+        this.popupMsg = '只支持查询同一天的轨迹数据，请重新选择日期'
+        this.dialogFormVisible = true
+        return
+      }
       const ret = await track({ gpsSn: this.currentSelectGPSSN, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate })
       if (ret.code === 0 && ret.data.track.length > 0) {
         // console.log(ret.data.track)
@@ -395,6 +421,7 @@ export default {
       } else {
         console.log('no data')
         this.removeMap()
+        this.popupMsg = '没有历史轨迹数据，请重新查询'
         this.dialogFormVisible = true
       }
     },
