@@ -13,7 +13,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="开始时间:" prop="startTime">
-          <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledStartDate" />
+          <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledStartDate" @change="changeEndFormatDate" />
         </el-form-item>
         <el-form-item label="结束时间:" prop="endTime">
           <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledEndDate" @change="changeStartFormatDate" />
@@ -67,12 +67,14 @@ export default {
       }
     },*/
     disabledStartDate(date) {
-      var endDate = new Date(this.currentSelectedEndDate)
-      return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 31) || (date.getTime() > endDate)
+      // var endDate = new Date(this.currentSelectedEndDate)
+      var endDate = Date.now() - 24 * 60 * 60 * 1000
+      return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 30) || (date.getTime() > endDate)
     },
     disabledEndDate(date) {
       // alert('date')
-      return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
+      var endDate = Date.now() - 24 * 60 * 60 * 1000
+      return (date.getTime() > Date.now() - 24 * 60 * 60 * 1000) || (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 30)
     },
     async getBusInfos() {
       const res = await getBusInfoList()
@@ -141,8 +143,13 @@ export default {
       var currentdate = year + seperator1 + month + seperator1 + strDate
       return currentdate
     },
+    changeEndFormatDate() {
+      if (new Date(this.currentSelectedStartDate) > new Date(this.currentSelectedEndDate)) {
+        this.currentSelectedEndDate = this.getNowFormatDate()
+      }
+    },
     changeStartFormatDate() {
-      var date = this.currentSelectedEndDate
+      /* var date = this.currentSelectedEndDate
       date = new Date(date)
       date = date - 1000 * 60 * 60 * 24 * 30
       date = new Date(date)
@@ -156,7 +163,10 @@ export default {
       if (strDate >= 0 && strDate <= 9) {
         strDate = '0' + strDate
       }
-      this.currentSelectedStartDate = year + seperator1 + month + seperator1 + strDate
+      this.currentSelectedStartDate = year + seperator1 + month + seperator1 + strDate*/
+      if (new Date(this.currentSelectedStartDate) > new Date(this.currentSelectedEndDate)) {
+        this.currentSelectedStartDate = this.getStartFormatDate()
+      }
       console.log(this.currentSelectedStartDate)
     },
     downLoadFile(type) {
