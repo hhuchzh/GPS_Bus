@@ -15,5 +15,6 @@ func (s *MilesInfoRouter) InitMilesInfoRouter(Router *gin.RouterGroup) {
 	var milesInfoApi = v1.ApiGroupApp.AutoCodeApiGroup.MilesInfoApi
 	{
 		milesInfoRouter.GET("getMilesInfoList", milesInfoApi.GetMilesInfoList)
+		milesInfoRouter.GET("exportExcel", milesInfoApi.ExportExcel)
 	}
 }

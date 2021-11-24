@@ -30,3 +30,15 @@ func (milesInfoApi *MilesInfoApi) GetMilesInfoList(c *gin.Context) {
         }, "获取成功", c)
     }
 }
+
+func (milesInfoApi *MilesInfoApi) ExportExcel(c *gin.Context) {
+    var export autocodeReq.MilesInfoExport
+    _ = c.ShouldBindQuery(&export)
+    if filePath, err := milesInfoService.ExportExcel(export); err != nil {
+        global.GVA_LOG.Error("导出失败!", zap.Any("err", err))
+        response.FailWithMessage("导出失败", c)
+    } else {
+        c.Writer.Header().Add("success", "true")
+        c.File(filePath)
+    }
+}

@@ -13,7 +13,7 @@ const (
     appKey = "8FB345B8693CCD00A8998F0F1B857182"
     appSecret = "69c9941dce84408a834d3e0286bddfa6"
     userID = "讯致网络"
-    userPwd = "a123456"
+    userPwd = "1qaz!QAZ"
     tokenExpiresIn = 7200
 )
 
