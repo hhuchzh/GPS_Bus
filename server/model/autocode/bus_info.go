@@ -2,6 +2,8 @@
 package autocode
 
 import (
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"gorm.io/gorm"
 )
@@ -25,7 +27,16 @@ func (BusInfo) TableName() string {
 	return "bus_info"
 }
 
+// BeforeDelete ..
+func (bus *BusInfo) BeforeDelete(tx *gorm.DB) (err error) {
+	bus1 := BusInfo{}
+	tx.Model(&BusInfo{}).Where("id = ?", bus.ID).Find(&bus1)
+
+	return tx.Model(&BusInfo{}).Where("id = ?", bus.ID).Update("BusPlate", bus1.BusPlate+"_"+time.Now().Format("2006-01-02 15:04:05")).Error
+}
+
+// AfterDelete ..
 func (bus *BusInfo) AfterDelete(tx *gorm.DB) (err error) {
-	return tx.Model(&GpsInfo{}).Where("bus_id = ?", bus.ID).Update("BusId", nil).Error
+	tx.Model(&GpsInfo{}).Where("bus_id = ?", bus.ID).Update("BusId", nil)
 	return tx.Model(&ClassesInfo{}).Where("bus_id = ?", bus.ID).Update("BusId", 0).Error
 }
