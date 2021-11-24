@@ -5,6 +5,8 @@ import (
     "time"
     "fmt"
     "errors"
+    "strings"
+    "sort"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
@@ -47,24 +49,44 @@ func (s *MilesInfoService) ExportExcel(export autoCodeReq.MilesInfoExport) (stri
 
     f := excelize.NewFile()
     index := f.NewSheet("Sheet1")
-    f.SetCellValue("Sheet1", FormatCoord(1, 1), "路线ID")
-    f.SetCellValue("Sheet1", FormatCoord(1, 2), "路线名")
-    f.SetCellValue("Sheet1", FormatCoord(1, 3), "日期")
-    f.SetCellValue("Sheet1", FormatCoord(1, 4), "里程(米)")
-    row := 2
+    f.SetCellValue("Sheet1", FormatCoord(1, 1), "日期")
+    f.SetCellValue("Sheet1", FormatCoord(1, 2), "路线ID")
+    f.SetCellValue("Sheet1", FormatCoord(1, 3), "路线名")
+    f.SetCellValue("Sheet1", FormatCoord(1, 4), "发车时间")
+    f.SetCellValue("Sheet1", FormatCoord(1, 5), "里程数(KM)")
+    miles_data := make(map[string][]autocode.MilesInfo)
+    class_data := make(map[uint][]string)
     for _, class := range classes {
+        route, err := s.LoadRouteByID(*class.RouteId)
+        if err != nil {
+            continue
+        }
         milesInfos, err := s.LoadMilesByClass(class.ID, export.BeginTime, export.EndTime)
         if err != nil {
             continue
         }
+
         for _, miles := range milesInfos {
-            f.SetCellValue("Sheet1", FormatCoord(row, 1), class.ID)
-            row++
-            f.SetCellValue("Sheet1", FormatCoord(row, 2), class.Remark)
-            row++
-            f.SetCellValue("Sheet1", FormatCoord(row, 3), miles.CalcDate)
-            row++
-            f.SetCellValue("Sheet1", FormatCoord(row, 4), miles.Distance)
+            stringSlice := strings.Split(miles.CalcDate, "T")
+            miles_data[stringSlice[0]] = append(miles_data[stringSlice[0]], miles)
+        }
+        class_data[class.ID] = append(class_data[class.ID], route.RouteName)
+        class_data[class.ID] = append(class_data[class.ID], class.ClassesTime)
+    }
+    var dates []string
+    for date, _ := range miles_data {
+        dates = append(dates, date)
+    }
+    sort.Strings(dates)
+    row := 2
+    for _, date := range dates {
+        milesInfo, _ := miles_data[date]
+        for _, miles := range milesInfo {
+            f.SetCellValue("Sheet1", FormatCoord(row, 1), date)
+            f.SetCellValue("Sheet1", FormatCoord(row, 2), *miles.ClassesId)
+            f.SetCellValue("Sheet1", FormatCoord(row, 3), class_data[*miles.ClassesId][0])
+            f.SetCellValue("Sheet1", FormatCoord(row, 4), class_data[*miles.ClassesId][1])
+            f.SetCellValue("Sheet1", FormatCoord(row, 5), miles.Distance/1000)
             row++
         }
     }
@@ -112,4 +134,16 @@ func (s *MilesInfoService) LoadClassByID(busID uint) ([]autocode.ClassesInfo, er
         return nil, errors.New("can not get class")
     }
     return classes, result.Error
+}
+
+func (s *MilesInfoService) LoadRouteByID(id uint) (autocode.RouteInfo, error) {
+    var route autocode.RouteInfo
+    result := global.GVA_DB.Where("id = ?", id).Find(&route)
+
+    var cnt int64
+    _ = result.Count(&cnt)
+    if cnt == 0 {
+        return autocode.RouteInfo{}, errors.New("can not get class")
+    }
+    return route, result.Error
 }
