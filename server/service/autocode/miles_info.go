@@ -18,6 +18,14 @@ import (
 type MilesInfoService struct {
 }
 
+type exportData struct {
+    date string
+    classId uint
+    routeName string
+    classTime string
+    distance float64
+}
+
 func (s *MilesInfoService) GetMilesInfoList(info autoCodeReq.MilesInfoSearch) (err error, list interface{}, total int64) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
@@ -38,15 +46,6 @@ func (s *MilesInfoService) GetMilesInfoList(info autoCodeReq.MilesInfoSearch) (e
 }
 
 func (s *MilesInfoService) ExportExcel(export autoCodeReq.MilesInfoExport) (string, error) {
-    busID, err := s.LoadBusIDByPlate(export.Plate)
-    if err != nil {
-        return "", err
-    }
-    classes, err := s.LoadClassByID(busID)
-    if err != nil {
-        return "", err
-    }
-
     f := excelize.NewFile()
     index := f.NewSheet("Sheet1")
     f.SetCellValue("Sheet1", FormatCoord(1, 1), "日期")
@@ -54,6 +53,36 @@ func (s *MilesInfoService) ExportExcel(export autoCodeReq.MilesInfoExport) (stri
     f.SetCellValue("Sheet1", FormatCoord(1, 3), "路线名")
     f.SetCellValue("Sheet1", FormatCoord(1, 4), "发车时间")
     f.SetCellValue("Sheet1", FormatCoord(1, 5), "里程数(KM)")
+    data, err := s.LoadData(export)
+    if err == nil {
+        row := 2
+        for _, d := range data {
+            f.SetCellValue("Sheet1", FormatCoord(row, 1), d.date)
+            f.SetCellValue("Sheet1", FormatCoord(row, 2), d.classId)
+            f.SetCellValue("Sheet1", FormatCoord(row, 3), d.routeName)
+            f.SetCellValue("Sheet1", FormatCoord(row, 4), d.classTime)
+            f.SetCellValue("Sheet1", FormatCoord(row, 5), d.distance)
+            row++
+        }
+    }
+    f.SetActiveSheet(index)
+    path, _ := os.Getwd()
+    fileName := fmt.Sprintf("%s/%s_miles_%d.xlsx", path, export.Plate, time.Now().Unix())
+    if err := f.SaveAs(fileName); err != nil {
+        return "", err
+    }
+    return fileName, nil
+}
+
+func (s *MilesInfoService) LoadData(export autoCodeReq.MilesInfoExport) ([]exportData, error) {
+    busID, err := s.LoadBusIDByPlate(export.Plate)
+    if err != nil {
+        return nil, err
+    }
+    classes, err := s.LoadClassByID(busID)
+    if err != nil {
+        return nil, err
+    }
     miles_data := make(map[string][]autocode.MilesInfo)
     class_data := make(map[uint][]string)
     for _, class := range classes {
@@ -78,25 +107,21 @@ func (s *MilesInfoService) ExportExcel(export autoCodeReq.MilesInfoExport) (stri
         dates = append(dates, date)
     }
     sort.Strings(dates)
-    row := 2
+
+    var data []exportData
     for _, date := range dates {
         milesInfo, _ := miles_data[date]
         for _, miles := range milesInfo {
-            f.SetCellValue("Sheet1", FormatCoord(row, 1), date)
-            f.SetCellValue("Sheet1", FormatCoord(row, 2), *miles.ClassesId)
-            f.SetCellValue("Sheet1", FormatCoord(row, 3), class_data[*miles.ClassesId][0])
-            f.SetCellValue("Sheet1", FormatCoord(row, 4), class_data[*miles.ClassesId][1])
-            f.SetCellValue("Sheet1", FormatCoord(row, 5), miles.Distance/1000)
-            row++
+            data = append(data, exportData{
+                date: date,
+                classId: *miles.ClassesId,
+                routeName: class_data[*miles.ClassesId][0],
+                classTime: class_data[*miles.ClassesId][1],
+                distance: miles.Distance/1000,
+            })
         }
     }
-    f.SetActiveSheet(index)
-    path, _ := os.Getwd()
-    fileName := fmt.Sprintf("%s/%s_miles_%d.xlsx", path, export.Plate, time.Now().Unix())
-    if err := f.SaveAs(fileName); err != nil {
-        return "", err
-    }
-    return fileName, nil
+    return data, nil
 }
 
 func (s *MilesInfoService) LoadMilesByClass(class uint, beginTime, endTime string) ([]autocode.MilesInfo, error) {
