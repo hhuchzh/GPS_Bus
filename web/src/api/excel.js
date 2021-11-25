@@ -83,3 +83,26 @@ export const downloadTemplate = (fileName) => {
     handleFileError(res, fileName)
   })
 }
+
+export const exportExcelMileage = (params, fileName) => {
+  service({
+    url: '/milesInfo/exportExcel',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  }).then((res) => {
+    handleFileError(res, fileName)
+  })
+}
+
+export const exportExcelCheckIn = (params, fileName) => {
+  service({
+    url: '/checkinInfo/exportExcel',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  }).then((res) => {
+    handleFileError(res, fileName)
+  })
+}
+

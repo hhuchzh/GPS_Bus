@@ -13,11 +13,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="班次:" prop="classId">
-          <el-select v-model="currnetSelectClassName" placeholder="请选择班次" @change="changeClassListOption($event)">
+          <el-select v-model="currnetSelectClassName" placeholder="请选择班次" style="width:280px" @change="changeClassListOption($event)">
             <el-option
               v-for="item in classList"
               :key="item.remark"
-              :label="item.remark"
+              :label="`${item.remark}(${item.busInfo.busPlate})`"
               :value="item.busId"
             />
           </el-select>
@@ -128,7 +128,7 @@ export default {
       if (res.code === 0) {
         this.classList = res.data.list
         if (this.classList && this.classList.length > 0) {
-          this.currnetSelectClassName = this.classList[0].remark
+          this.currnetSelectClassName = this.classList[0].remark + '(' + this.classList[0].busInfo.busPlate + ')'
           this.currnetSelectBusId = this.classList[0].busId
           this.currentSelectClassId = this.classList[0].ID
           this.getBusInfo()

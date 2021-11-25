@@ -29,6 +29,10 @@
 
 <script>
 import {
+  exportExcelMileage,
+  exportExcelCheckIn
+} from '@/api/excel'
+import {
   findBusInfo,
   getBusInfoList
 } from '@/api/bus_info'
@@ -170,7 +174,15 @@ export default {
       console.log(this.currentSelectedStartDate)
     },
     downLoadFile(type) {
-      // TBD
+      var fileName
+      if (type === 'checkin') {
+        fileName = this.currentSelectedPlate + '_checkin_from_' + this.currentSelectedStartDate + '_to_' + this.currentSelectedEndDate + '.xlsx'
+        exportExcelCheckIn({ plate: this.currentSelectedPlate, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate }, fileName)
+      } else if (type === 'mileage') {
+        fileName = this.currentSelectedPlate + '_miles_from_' + this.currentSelectedStartDate + '_to_' + this.currentSelectedEndDate + '.xlsx'
+        console.log(fileName)
+        exportExcelMileage({ plate: this.currentSelectedPlate, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate }, fileName)
+      }
     },
   },
 }

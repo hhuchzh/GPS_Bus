@@ -44,7 +44,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="备注" prop="remark" min-width="150" align="center" />
+      <el-table-column label="班次名称" prop="remark" min-width="150" align="center" />
       <!--edit&del button -->
       <el-table-column fixed="right" label="操作" min-width="200" align="center">
         <template #default="scope">
@@ -70,7 +70,7 @@
         <el-form-item min-width="150" label="发车时间:" prop="classesTime">
           <el-time-picker v-model="formData.classesTime" placeholder="发车时间" clearable autocomplete="off" value-format="HH:mm:ss" />
         </el-form-item>
-        <el-form-item min-width="150" label="备注:" prop="remark">
+        <el-form-item min-width="150" label="班次名称:" prop="remark">
           <el-input v-model="formData.remark" placeholder="请输入" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item label="车牌号:" prop="busId">
@@ -131,7 +131,7 @@ export default {
       },
       rules: {
         classesTime: [{ required: true, message: '请输入发车时间', trigger: 'blur' }],
-        // busId: [{ required: true, message: '请选择车牌号', trigger: 'blur' }],
+        remark: [{ required: true, message: '请输入班次名称', trigger: 'blur' }],
       },
     }
   },
