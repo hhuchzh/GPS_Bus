@@ -2,20 +2,20 @@ package autocode
 
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-    autocodeReq "github.com/flipped-aurora/gin-vue-admin/server/model/autocode/request"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/service"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
+	autocodeReq "github.com/flipped-aurora/gin-vue-admin/server/model/autocode/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/checkin"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type CheckinInfoApi struct {
 }
 
 var checkinInfoService = service.ServiceGroupApp.AutoCodeServiceGroup.CheckinInfoService
-
 
 // CreateCheckinInfo 创建CheckinInfo
 // @Tags CheckinInfo
@@ -30,7 +30,7 @@ func (checkinInfoApi *CheckinInfoApi) CreateCheckinInfo(c *gin.Context) {
 	var checkinInfo autocode.CheckinInfo
 	_ = c.ShouldBindJSON(&checkinInfo)
 	if err := checkinInfoService.CreateCheckinInfo(checkinInfo); err != nil {
-        global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -50,7 +50,7 @@ func (checkinInfoApi *CheckinInfoApi) DeleteCheckinInfo(c *gin.Context) {
 	var checkinInfo autocode.CheckinInfo
 	_ = c.ShouldBindJSON(&checkinInfo)
 	if err := checkinInfoService.DeleteCheckinInfo(checkinInfo); err != nil {
-        global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -68,9 +68,9 @@ func (checkinInfoApi *CheckinInfoApi) DeleteCheckinInfo(c *gin.Context) {
 // @Router /checkinInfo/deleteCheckinInfoByIds [delete]
 func (checkinInfoApi *CheckinInfoApi) DeleteCheckinInfoByIds(c *gin.Context) {
 	var IDS request.IdsReq
-    _ = c.ShouldBindJSON(&IDS)
+	_ = c.ShouldBindJSON(&IDS)
 	if err := checkinInfoService.DeleteCheckinInfoByIds(IDS); err != nil {
-        global.GVA_LOG.Error("批量删除失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("批量删除失败!", zap.Any("err", err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -90,7 +90,7 @@ func (checkinInfoApi *CheckinInfoApi) UpdateCheckinInfo(c *gin.Context) {
 	var checkinInfo autocode.CheckinInfo
 	_ = c.ShouldBindJSON(&checkinInfo)
 	if err := checkinInfoService.UpdateCheckinInfo(checkinInfo); err != nil {
-        global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -110,7 +110,7 @@ func (checkinInfoApi *CheckinInfoApi) FindCheckinInfo(c *gin.Context) {
 	var checkinInfo autocode.CheckinInfo
 	_ = c.ShouldBindQuery(&checkinInfo)
 	if err, recheckinInfo := checkinInfoService.GetCheckinInfo(checkinInfo.ID); err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"recheckinInfo": recheckinInfo}, c)
@@ -130,14 +130,28 @@ func (checkinInfoApi *CheckinInfoApi) GetCheckinInfoList(c *gin.Context) {
 	var pageInfo autocodeReq.CheckinInfoSearch
 	_ = c.ShouldBindQuery(&pageInfo)
 	if err, list, total := checkinInfoService.GetCheckinInfoInfoList(pageInfo); err != nil {
-	    global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
-        response.FailWithMessage("获取失败", c)
-    } else {
-        response.OkWithDetailed(response.PageResult{
-            List:     list,
-            Total:    total,
-            Page:     pageInfo.Page,
-            PageSize: pageInfo.PageSize,
-        }, "获取成功", c)
-    }
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
+}
+
+// ExportExcel ...
+func (checkinInfoApi *CheckinInfoApi) ExportExcel(c *gin.Context) {
+	var export autocodeReq.MilesInfoExport
+	_ = c.ShouldBindQuery(&export)
+	checkinMonitor := checkin.CheckinMonitor{}
+	if filePath, err := checkinMonitor.ExportExcel(export.Plate, export.BeginTime, export.EndTime); err != nil {
+		global.GVA_LOG.Error("导出失败!", zap.Any("err", err))
+		response.FailWithMessage("导出失败", c)
+	} else {
+		c.Writer.Header().Add("success", "true")
+		c.File(filePath)
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -11,7 +12,9 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/gps"
+	service "github.com/flipped-aurora/gin-vue-admin/server/service/autocode"
 	"github.com/robfig/cron/v3"
+	"github.com/xuri/excelize/v2"
 	"go.uber.org/zap"
 	"gorm.io/gorm/clause"
 )
@@ -211,6 +214,7 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 	for _, gps = range gpsList {
 		curLng, _ := strconv.ParseFloat(arrival.Location.Longtitude, 64)
 		curLat, _ := strconv.ParseFloat(arrival.Location.Latitude, 64)
+
 		stringSlice := strings.Split(gps.GpsTime, "T")
 		gpsTime, _ = time.Parse("2006-01-02 15:04:05", stringSlice[0]+" "+strings.Split(stringSlice[1], "+")[0])
 
@@ -276,7 +280,6 @@ func (monitor *CheckinMonitor) loadClassses() (list interface{}, cnt int64, err 
 	err = db.Find(&classesInfos).Error
 
 	return classesInfos, cnt, err
-
 }
 
 func (monitor *CheckinMonitor) loadArrivals(id uint64) (list interface{}, err error) {
@@ -302,4 +305,119 @@ func (monitor *CheckinMonitor) updateCheckin(arrival uint, classes uint, checkin
 	global.GVA_LOG.Info("update checkin...", zap.Uint("classes_id", classes), zap.Uint("arrival_id", arrival), zap.String("date", checkinDate), zap.String("time", checkinTime))
 
 	return global.GVA_DB.Clauses(clause.OnConflict{DoNothing: true}).Create(&checkin).Error
+}
+
+func (monitor *CheckinMonitor) loadBusIDByPlate(plate string) (uint, error) {
+	var bus autocode.BusInfo
+	result := global.GVA_DB.Where("bus_plate = ?", plate).Find(&bus)
+
+	var cnt int64
+	_ = result.Count(&cnt)
+	if cnt == 0 {
+		return 0, errors.New("can not get busid")
+	}
+	return bus.ID, result.Error
+}
+
+func (monitor *CheckinMonitor) loadClassByBusID(busID uint) ([]autocode.ClassesInfo, error) {
+	var classes []autocode.ClassesInfo
+	result := global.GVA_DB.Where("bus_id = ?", busID).Find(&classes)
+
+	var cnt int64
+	_ = result.Count(&cnt)
+	if cnt == 0 {
+		return nil, errors.New("can not get class")
+	}
+	return classes, result.Error
+}
+
+func (monitor *CheckinMonitor) loadRouteByID(id uint) (autocode.RouteInfo, error) {
+	var route autocode.RouteInfo
+	result := global.GVA_DB.Where("id = ?", id).Find(&route)
+
+	var cnt int64
+	_ = result.Count(&cnt)
+	if cnt == 0 {
+		return autocode.RouteInfo{}, errors.New("can not get route")
+	}
+	return route, result.Error
+}
+
+func (monitor *CheckinMonitor) loadCheckinInfos(ids []uint, start string, end string) ([]autocode.CheckinInfo, error) {
+	var checkinData []autocode.CheckinInfo
+	err := global.GVA_DB.Where("classes_id in ?", ids).Where("checkin_date >= ?", start).Where("checkin_date <= ?", end).Order("checkin_date").Order("classes_id").Find(&checkinData).Error
+
+	return checkinData, err
+}
+
+// ExportExcel ...
+func (monitor *CheckinMonitor) ExportExcel(plate string, start string, end string) (string, error) {
+	busID, err := monitor.loadBusIDByPlate(plate)
+	if err != nil {
+		return "", err
+	}
+	classes, err := monitor.loadClassByBusID(busID)
+	if err != nil {
+		return "", err
+	}
+
+	f := excelize.NewFile()
+	index := f.NewSheet("Sheet1")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 1), "日期")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 2), "车牌号")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 3), "路线ID")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 4), "路线名")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 5), "班次ID")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 6), "班次")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 7), "发车时间")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 8), "站点名字")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 9), "站点时间")
+	f.SetCellValue("Sheet1", service.FormatCoord(1, 10), "打卡时间")
+
+	var classesIDs []uint
+	classesMap := make(map[uint]autocode.ClassesInfo)
+	for _, class := range classes {
+		classesIDs = append(classesIDs, class.ID)
+		classesMap[class.ID] = class
+	}
+
+	checkins, err := monitor.loadCheckinInfos(classesIDs, start, end)
+	if err != nil {
+		return "", err
+	}
+	row := 2
+	for _, checkinItem := range checkins {
+		classItem := classesMap[*checkinItem.ClassesId]
+		route, err := monitor.loadRouteByID(*classItem.RouteId)
+		if err != nil {
+			continue
+		}
+		stringSlice := strings.Split(checkinItem.CheckinDate, "T")
+		checkinData := stringSlice[0]
+
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 1), checkinData)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 2), plate)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 3), route.ID)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 4), route.RouteName)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 5), classItem.ID)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 6), classItem.Remark)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 7), classItem.ClassesTime)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 8), checkinItem.Arrival.Location.LocationName)
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 9), checkinItem.Arrival.ArrivalTime)
+
+		var checkinTime string = checkinItem.CheckinTime
+		if checkinTime == "00:00:00" {
+			checkinTime = "打卡异常"
+		}
+		f.SetCellValue("Sheet1", service.FormatCoord(row, 10), checkinTime)
+		row++
+	}
+
+	f.SetActiveSheet(index)
+	path, _ := os.Getwd()
+	fileName := fmt.Sprintf("%s/%s_checkin_%d.xlsx", path, plate, time.Now().Unix())
+	if err := f.SaveAs(fileName); err != nil {
+		return "", err
+	}
+	return fileName, nil
 }
