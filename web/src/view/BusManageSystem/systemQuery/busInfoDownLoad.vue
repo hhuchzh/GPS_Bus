@@ -44,7 +44,6 @@ export default {
       busInfoList: [],
       currentSelectedID: -1,
       currentSelectedPlate: '',
-      currentSelectGPSSN: '',
       currentSelectedEndDate: this.getNowFormatDate(),
       currentSelectedStartDate: this.getStartFormatDate(),
     }
@@ -53,23 +52,6 @@ export default {
     this.getBusInfos()
   },
   methods: {
-    /* async getListData(page = this.listdata.page, pageSize = this.listdata.pageSize) {
-      var data = await getClassesInfoList({ page, pageSize, busId: parseInt(this.currentSelectedID) })
-      if (data.code === 0) {
-        for (var idx = 0; idx < data.data.list.length; idx++) {
-          data.data.list[idx]['busPlate'] = this.currentSelectedPlate
-          var routeId = parseInt(data.data.list[idx].routeId)
-          var ret = await findRouteInfo({ ID: routeId })
-          if (ret.code === 0) {
-            data.data.list[idx]['routeName'] = ret.data.rerouteInfo.routeName
-          }
-        }
-        this.listdata.page = data.data.page
-        this.listdata.pageSize = data.data.pageSize
-        this.listdata.total = data.data.total
-        this.listdata.tableData = data.data.list
-      }
-    },*/
     disabledStartDate(date) {
       // var endDate = new Date(this.currentSelectedEndDate)
       var endDate = Date.now() - 24 * 60 * 60 * 1000
@@ -84,10 +66,10 @@ export default {
       const res = await getBusInfoList()
       if (res.code === 0) {
         this.busInfoList = res.data.list
+        console.log(this.busInfoList)
         if (this.busInfoList && this.busInfoList.length > 0) {
           this.currentSelectedPlate = this.busInfoList[0].busPlate
           this.currentSelectedID = this.busInfoList[0].ID
-          this.getBusInfo()
         } else {
           this.currentSelectedPlate = ''
           this.currentSelectedID = -1
@@ -96,7 +78,7 @@ export default {
     },
     changeOption(event) {
       this.currentSelectedID = event
-      this.getBusInfo()
+      this.getBusPlate()
     },
     sortChange({ prop, order }) {
       if (prop) {
@@ -105,11 +87,11 @@ export default {
       }
       this.getTableData()
     },
-    async getBusInfo() {
+    async getBusPlate() {
       const res = await findBusInfo({ ID: this.currentSelectedID })
       if (res.code === 0) {
-        if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
-          this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
+        if (res.data.rebusInfo) {
+          this.currentSelectedPlate = res.data.rebusInfo.busPlate
         }
       }
     },
@@ -180,7 +162,6 @@ export default {
         exportExcelCheckIn({ plate: this.currentSelectedPlate, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate }, fileName)
       } else if (type === 'mileage') {
         fileName = this.currentSelectedPlate + '_miles_from_' + this.currentSelectedStartDate + '_to_' + this.currentSelectedEndDate + '.xlsx'
-        console.log(fileName)
         exportExcelMileage({ plate: this.currentSelectedPlate, beginTime: this.currentSelectedStartDate, endTime: this.currentSelectedEndDate }, fileName)
       }
     },
