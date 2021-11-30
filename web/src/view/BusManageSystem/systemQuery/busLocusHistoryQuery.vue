@@ -438,7 +438,7 @@ export default {
               fontSize: '10px',
               width: '80px',
               // height: '20px',
-              opacity: '0.5',
+              opacity: '0.8',
               verticalAlign: 'center',
               textAlign: 'center',
               borderRadius: '2px',
@@ -450,7 +450,7 @@ export default {
             this.map.addOverlay(locationMarker)
           }
         }
-        var polyline
+        /* var polyline
         var map = this.map
         var options = {
           onSearchComplete: function(results) {
@@ -473,7 +473,7 @@ export default {
         var driving = new window.BMap.DrivingRoute(this.map, options)
         for (var j = 0; j < this.locationPointsList.length - 1; j++) {
           driving.search(this.locationPointsList[j], this.locationPointsList[j + 1])
-        }
+        }*/
       }
     },
   },
