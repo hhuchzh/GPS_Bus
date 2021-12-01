@@ -12,12 +12,15 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="开始时间:" prop="startTime">
+        <el-form-item label="月份:" prop="startTime">
+          <el-date-picker v-model="currentSelectMonth" placeholder="请选择月份" value-format="YYYY-MM" type="month" :disabled-date="disabledMonth" @change="changeCurrentMonth" />
+        </el-form-item>
+        <!-- <el-form-item label="开始时间:" prop="startTime">
           <el-date-picker v-model="currentSelectedStartDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledStartDate" @change="changeEndFormatDate" />
         </el-form-item>
         <el-form-item label="结束时间:" prop="endTime">
           <el-date-picker v-model="currentSelectedEndDate" placeholder="请选择日期" value-format="YYYY-MM-DD" type="date" :disabled-date="disabledEndDate" @change="changeStartFormatDate" />
-        </el-form-item>
+        </el-form-item>-->
         <el-form-item>
           <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile('checkin')">导出打卡数据</el-button>
           <el-button size="mini" type="primary" icon="el-icon-download" @click="downLoadFile('mileage')">导出里程数据</el-button>
@@ -46,19 +49,30 @@ export default {
       currentSelectedPlate: '',
       currentSelectedEndDate: this.getNowFormatDate(),
       currentSelectedStartDate: this.getStartFormatDate(),
+      currentSelectMonth: this.getCurrentMonth(),
     }
   },
   async created() {
     this.getBusInfos()
   },
   methods: {
-    disabledStartDate(date) {
+    disabledMonth(date) {
       // var endDate = new Date(this.currentSelectedEndDate)
+      var currentDate = new Date()
+      currentDate.setMonth(currentDate.getMonth() - 3)
+      var year = currentDate.getFullYear()
+      var month = currentDate.getMonth() + 1
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      var lastDate = new Date((year + '-' + month))
+      return (date.getTime() < lastDate || date.getTime() > Date.now())
+    },
+    disabledStartDate(date) {
       var endDate = Date.now() - 24 * 60 * 60 * 1000
       return (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 30) || (date.getTime() > endDate)
     },
     disabledEndDate(date) {
-      // alert('date')
       var endDate = Date.now() - 24 * 60 * 60 * 1000
       return (date.getTime() > Date.now() - 24 * 60 * 60 * 1000) || (date.getTime() < endDate - 24 * 60 * 60 * 1000 * 30)
     },
@@ -88,6 +102,7 @@ export default {
       this.getTableData()
     },
     async getBusPlate() {
+      this.currentSelectedPlate = ''
       const res = await findBusInfo({ ID: this.currentSelectedID })
       if (res.code === 0) {
         if (res.data.rebusInfo) {
@@ -112,6 +127,18 @@ export default {
       var currentdate = year + seperator1 + month + seperator1 + strDate
       return currentdate
     },
+    getCurrentMonth() {
+      var date = new Date()
+      var seperator1 = '-'
+      var year = date.getFullYear()
+      var month = date.getMonth() + 1
+      if (month >= 1 && month <= 9) {
+        month = '0' + month
+      }
+      var currentMonth = year + seperator1 + month
+      this.changeCurrentMonth(currentMonth)
+      return currentMonth
+    },
     getStartFormatDate() {
       var date = new Date()
       date = date - 1000 * 60 * 60 * 24 * 30
@@ -133,6 +160,13 @@ export default {
       if (new Date(this.currentSelectedStartDate) > new Date(this.currentSelectedEndDate)) {
         this.currentSelectedEndDate = this.getNowFormatDate()
       }
+    },
+    changeCurrentMonth(date) {
+      var str = date.split('-')
+      var tempDate = new Date(str[0], str[1], 0)
+      var days = tempDate.getDate()
+      this.currentSelectedStartDate = date + '-01'
+      this.currentSelectedEndDate = date + '-' + days
     },
     changeStartFormatDate() {
       /* var date = this.currentSelectedEndDate

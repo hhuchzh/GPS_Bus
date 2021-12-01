@@ -51,7 +51,6 @@
 
 <script>
 import {
-  findBusInfo,
   getBusInfoList
 } from '@/api/bus_info'
 import {
@@ -71,7 +70,6 @@ export default {
       busInfoList: [],
       currentSelectedID: -1,
       currentSelectedPlate: '',
-      currentSelectGPSSN: '',
       currentSelectedDate: this.getNowFormatDate(),
       listdata: {
         page: 1,
@@ -95,11 +93,11 @@ export default {
           data.data.list[idx]['busPlate'] = this.currentSelectedPlate
           var routeId = parseInt(data.data.list[idx].routeId)
           var ret = await findRouteInfo({ ID: routeId })
-          if (ret.code === 0) {
+          if (ret.code === 0 && ret.data && ret.data.rerouteInfo) {
             data.data.list[idx]['routeName'] = ret.data.rerouteInfo.routeName
           }
           var res = await getMilesInfoList({ classesId: parseInt(data.data.list[idx].ID), calcDate: this.currentSelectedDate })
-          if (res.code === 0) {
+          if (res.code === 0 && res.data.list && res.data.list.length > 0) {
             data.data.list[idx]['distance'] = this.getDistance(res.data.list[0].distance)
           }
         }
@@ -126,7 +124,6 @@ export default {
       }
     },
     disabledDate(date) {
-      // alert('date')
       return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
     },
     async getBusInfos() {
@@ -136,7 +133,6 @@ export default {
         if (this.busInfoList && this.busInfoList.length > 0) {
           this.currentSelectedPlate = this.busInfoList[0].busPlate
           this.currentSelectedID = this.busInfoList[0].ID
-          this.getBusInfo()
         } else {
           this.currentSelectedPlate = ''
           this.currentSelectedID = -1
@@ -145,15 +141,6 @@ export default {
     },
     changeOption(event) {
       this.currentSelectedID = event
-      this.getBusInfo()
-    },
-    async getBusInfo() {
-      const res = await findBusInfo({ ID: this.currentSelectedID })
-      if (res.code === 0) {
-        if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
-          this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
-        }
-      }
     },
     getNowFormatDate() {
       var date = new Date()
@@ -180,8 +167,6 @@ export default {
     },
     // 条件搜索前端看此方法
     onSubmit() {
-      // TBD
-      // this.listdata.page = 1
       this.initParameter()
       this.getListData()
     },

@@ -18,7 +18,7 @@
               v-for="item in classList"
               :key="item.remark"
               :label="`${item.remark}(${item.busInfo.busPlate})`"
-              :value="item.busId"
+              :value="`${item.busId}-${item.ID}`"
             />
           </el-select>
         </el-form-item>
@@ -69,8 +69,8 @@ export default {
     return {
       map: {},
       currentSelectGPSSN: '',
-      currentSelectedStartDate: this.getNowDate(),
-      currentSelectedEndDate: this.getNowDate(),
+      currentSelectedStartDate: '',
+      currentSelectedEndDate: '',
       preMarker: null,
       pointIdx: 0,
       pointList: [],
@@ -98,7 +98,7 @@ export default {
       currentSelectClassId: -1,
       locationPointsList: [],
       prePoint: null,
-      popupMsg: ''
+      popupMsg: '',
     }
   },
   async created() {
@@ -132,6 +132,7 @@ export default {
           this.currnetSelectBusId = this.classList[0].busId
           this.currentSelectClassId = this.classList[0].ID
           this.getBusInfo()
+          this.getStartAndEndTimeOfClass()
           // this.getArrivalInfoList()
         } else {
           this.currnetSelectClassName = ''
@@ -146,17 +147,21 @@ export default {
     changeClassListOption(event) {
       // TBD
       console.log(event)
-      this.currnetSelectBusId = event
+      var strs = event.split('-')
+      this.currnetSelectBusId = strs[0]
+      this.currentSelectClassId = strs[1]
       this.getBusInfo()
+      this.getStartAndEndTimeOfClass()
     },
     async getBusInfo() {
+      this.currentSelectGPSSN = ''
       const res = await findBusInfo({ ID: this.currnetSelectBusId })
-      // console.log(res)
-      // console.log(res.data)
       if (res.code === 0) {
         if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
           this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
           console.log(this.currentSelectGPSSN)
+        } else {
+          this.currentSelectGPSSN = ''
         }
       }
     },
@@ -171,6 +176,26 @@ export default {
     disabledDate(date) {
       // alert('date')
       return date.getTime() > Date.now()
+    },
+    async getStartAndEndTimeOfClass() {
+      var myDate = new Date()
+      var year = myDate.getFullYear()
+      var mon = myDate.getMonth() + 1
+      var date = myDate.getDate()
+      if (mon >= 1 && mon <= 9) {
+        mon = '0' + mon
+      }
+      if (date >= 0 && date <= 9) {
+        date = '0' + date
+      }
+
+      var data = await getArrivalInfoList({ classesId: this.currentSelectClassId })
+      if (data.code === 0) {
+        if (data.data.list && data.data.list.length > 0) {
+          this.currentSelectedStartDate = year + '-' + mon + '-' + date + ' ' + data.data.list[0].arrivalTime
+          this.currentSelectedEndDate = year + '-' + mon + '-' + date + ' ' + data.data.list[data.data.list.length - 1].arrivalTime
+        }
+      }
     },
     getNowDate() {
       var myDate = new Date()

@@ -48,9 +48,9 @@
     />
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="打卡详情">
       <el-table ref="locationList" :data="locationListdata.tableData" border stripe>
-        <el-table-column label="站点名称" prop="arrivalInfo.Location.locationName" min-width="100" align="center" />
-        <el-table-column label="站点时间" prop="arrivalInfo.arrivalTime" min-width="200" align="center" />
-        <el-table-column label="打卡状态" prop="checkinTime" min-width="100" align="center">
+        <el-table-column label="站点名称" prop="arrivalInfo.Location.locationName" min-width="150" align="center" />
+        <el-table-column label="站点时间" prop="arrivalInfo.arrivalTime" min-width="150" align="center" />
+        <el-table-column label="打卡状态" prop="checkinTime" min-width="150" align="center">
           <template #default="scope">
             <span v-if="scope.row.checkinTime==='00:00:00'" style="color: red">异常打卡</span>
             <span v-else style="color: black">正常打卡</span>
@@ -77,7 +77,6 @@
 
 <script>
 import {
-  findBusInfo,
   getBusInfoList
 } from '@/api/bus_info'
 import {
@@ -88,7 +87,6 @@ import {
 } from '@/api/route_info'
 import {
   getCheckinInfoList,
-  createCheckinInfo
 } from '@/api/checkin_info'
 // import infoList from '@/mixins/infoList'
 import { toSQLLine } from '@/utils/stringFun'
@@ -98,7 +96,6 @@ export default {
       busInfoList: [],
       currentSelectedID: -1,
       currentSelectedPlate: '',
-      currentSelectGPSSN: '',
       currentSelectedDate: this.getNowFormatDate(),
       listdata: {
         page: 1,
@@ -146,7 +143,6 @@ export default {
       }
     },
     disabledDate(date) {
-      // alert('date')
       return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
     },
     handleSizeChangeList(val) {
@@ -164,7 +160,6 @@ export default {
         if (this.busInfoList && this.busInfoList.length > 0) {
           this.currentSelectedPlate = this.busInfoList[0].busPlate
           this.currentSelectedID = this.busInfoList[0].ID
-          this.getBusInfo()
         } else {
           this.currentSelectedPlate = ''
           this.currentSelectedID = -1
@@ -173,7 +168,6 @@ export default {
     },
     changeOption(event) {
       this.currentSelectedID = event
-      this.getBusInfo()
     },
     sortChange({ prop, order }) {
       if (prop) {
@@ -181,14 +175,6 @@ export default {
         this.searchInfo.desc = order === 'descending'
       }
       this.getTableData()
-    },
-    async getBusInfo() {
-      const res = await findBusInfo({ ID: this.currentSelectedID })
-      if (res.code === 0) {
-        if (res.data.rebusInfo && res.data.rebusInfo.gpsInfos[0]) {
-          this.currentSelectGPSSN = res.data.rebusInfo.gpsInfos[0].gpsSn
-        }
-      }
     },
     getNowFormatDate() {
       var date = new Date()
@@ -240,19 +226,6 @@ export default {
         this.locationListdata.tableData = res.data.list
       }
     },
-    createCheckinInfoTest() {
-      createCheckinInfo({ classesId: 41, locationId: 63, checkinTime: '2021-10-15 07:00:00', checkinDate: '2021-10-15', arrivalId: 38 })
-      createCheckinInfo({ classesId: 41, locationId: 64, checkinTime: '2021-10-15 07:10:00', checkinDate: '2021-10-15', arrivalId: 39 })
-      createCheckinInfo({ classesId: 41, locationId: 65, checkinTime: '2021-10-15 07:20:00', checkinDate: '2021-10-15', arrivalId: 40 })
-      createCheckinInfo({ classesId: 41, locationId: 66, checkinTime: '2021-10-15 07:30:00', checkinDate: '2021-10-15', arrivalId: 41 })
-      createCheckinInfo({ classesId: 41, locationId: 67, checkinTime: '2021-10-15 07:40:00', checkinDate: '2021-10-15', arrivalId: 42 })
-      createCheckinInfo({ classesId: 41, locationId: 68, checkinTime: '', checkinDate: '2021-10-15', arrivalId: 43 })
-      createCheckinInfo({ classesId: 41, locationId: 69, checkinTime: '2021-10-15 07:00:00', checkinDate: '2021-10-15', arrivalId: 44 })
-      createCheckinInfo({ classesId: 41, locationId: 70, checkinTime: '2021-10-15 07:00:00', checkinDate: '2021-10-15', arrivalId: 45 })
-      createCheckinInfo({ classesId: 41, locationId: 71, checkinTime: '', checkinDate: '2021-10-15', arrivalId: 46 })
-      createCheckinInfo({ classesId: 41, locationId: 72, checkinTime: '2021-10-15 07:00:00', checkinDate: '2021-10-15', arrivalId: 47 })
-      createCheckinInfo({ classesId: 41, locationId: 73, checkinTime: '', checkinDate: '2021-10-15', arrivalId: 48 })
-    }
   },
 }
 </script>

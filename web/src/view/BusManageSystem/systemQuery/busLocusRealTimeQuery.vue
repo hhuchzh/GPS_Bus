@@ -117,20 +117,17 @@ export default {
         this.gpsInfoList[i].preMarker = null
         this.gpsInfoList[i].busPlate = ''
         var tempBus = await findBusInfo({ ID: this.gpsInfoList[i].busId })
-        // console.log(tempBus)
         if (tempBus.code === 0) {
           if (tempBus.data.rebusInfo && tempBus.data.rebusInfo.busPlate) {
             this.gpsInfoList[i].busPlate = tempBus.data.rebusInfo.busPlate
           }
         }
       }
-      // console.log(this.gpsInfoList)
     },
     async getBusInfos() {
       const res = await getBusInfoList()
       if (res.code === 0) {
         this.busInfoList = res.data.list
-        // console.log(this.busInfoList.length)
         if (this.busInfoList && this.busInfoList.length > 0) {
           this.currentSelectedPlate = this.busInfoList[0].busPlate
           this.currentSelectedID = this.busInfoList[0].ID
@@ -203,7 +200,6 @@ export default {
     createMarker(gpsInfo, idx) {
       const BMap = window.BMap
       var centerPoint = new BMap.Point(gpsInfo.lng, gpsInfo.lat)
-      console.log('aaaaaaaaaaaaaaaaaaaaaaaaa : ' + gpsInfo.accStatus)
       var marker = null
       var dir = Number(gpsInfo.dir)
       var accStatus = '关'
@@ -313,7 +309,6 @@ export default {
         }
       }
       for (var i = 0; i < this.gpsInfoList.length; i++) {
-        // console.log(this.gpsInfoList[i].gpsSn)
         if (this.type === 'single') {
           const ret = await getLocation({ gpsSn: this.gpsInfoList[i].gpsSn })
           if (ret.code === 0) {
@@ -451,7 +446,6 @@ export default {
       return now
     },
     async showRealTimePath() {
-      console.log(this.gpsInfoList[0].gpsSn)
       const ret = await getLocation({ gpsSn: this.gpsInfoList[0].gpsSn })
       if (ret.code === 0) {
         if (this.timerId != null) {
