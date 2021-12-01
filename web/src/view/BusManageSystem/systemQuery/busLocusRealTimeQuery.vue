@@ -18,6 +18,16 @@
       </el-form>
     </div>
     <div id="container" style="width: 1600px; height: 750px;" />
+    <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" width="20%" top="15%">
+      <el-form>
+        <p style="text-align:center">没有实时位置数据，请重新选择车辆</p>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="mini" type="primary" @click="closeDialog">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -66,7 +76,8 @@ export default {
       gpsInfoList: [],
       viewSize: 18,
       queryType: 'single',
-      currentGpsList: []
+      currentGpsList: [],
+      dialogFormVisible: false
     }
   },
   async created() {
@@ -203,69 +214,86 @@ export default {
       var marker = null
       var dir = Number(gpsInfo.dir)
       var accStatus = '关'
+      var carColor = '#228b22'
       if (dir === 0 || dir === 360) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_0 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_0 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir > 0 && dir < 90) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_1 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_1 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir === 90) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_2 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_2 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir > 90 && dir < 180) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_3 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_3 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir === 180) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_4 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_4 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir > 180 && dir < 270) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_5 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_5 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir === 270) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_6 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_6 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       } else if (dir > 270 && dir < 360) {
         if (gpsInfo.accStatus === 0) {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_static_7 })
           accStatus = '关'
+          carColor = '#ff0000'
         } else {
           marker = new window.BMap.Marker(centerPoint, { icon: this.carIcon_7 })
           accStatus = '开'
+          carColor = '#228b22'
         }
       }
       var str = '速度: ' + gpsInfo.speed + ' KM/H'
@@ -278,7 +306,9 @@ export default {
       str += '<br>'
       str += '定位时间 : ' + this.getNowDate()
       str += '<br>'
-
+      this.gpsInfoList[idx].label.setStyle({
+        backgroundColor: carColor,
+      })
       this.gpsInfoList[idx].label.setContent(str)
       marker.setLabel(this.gpsInfoList[idx].label)
       if ((this.type === 'all' && gpsInfo.speed !== 0) || this.type === 'single') {
@@ -446,6 +476,10 @@ export default {
       return now
     },
     async showRealTimePath() {
+      if (this.gpsInfoList.length === 0) {
+        this.dialogFormVisible = true
+        return
+      }
       const ret = await getLocation({ gpsSn: this.gpsInfoList[0].gpsSn })
       if (ret.code === 0) {
         if (this.timerId != null) {
@@ -470,6 +504,9 @@ export default {
     // 条件搜索前端看此方法
     onSubmit() {
       this.showRealTimePath()
+    },
+    closeDialog() {
+      this.dialogFormVisible = false
     },
   },
 }
