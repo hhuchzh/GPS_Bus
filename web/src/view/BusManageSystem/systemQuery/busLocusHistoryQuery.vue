@@ -453,7 +453,7 @@ export default {
           if (data.data.list[i].Location) {
             this.locationPointsList.push(new window.BMap.Point(data.data.list[i].Location.longtitude, data.data.list[i].Location.latitude))
             var locationMarker = new window.BMap.Marker(this.locationPointsList[i])
-            var tempLabel = new window.BMap.Label(data.data.list[i].Location.locationName, {
+            var tempLabel = new window.BMap.Label(data.data.list[i].Location.orderNo + '-' + data.data.list[i].Location.locationName, {
               offset: new window.BMap.Size(20, -10)
             })
             tempLabel.setStyle({
@@ -461,7 +461,7 @@ export default {
               backgroundColor: '#333333',
               border: '0',
               fontSize: '10px',
-              width: '80px',
+              width: '100px',
               // height: '20px',
               opacity: '0.8',
               verticalAlign: 'center',
