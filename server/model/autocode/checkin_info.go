@@ -15,6 +15,7 @@ type CheckinInfo struct {
 	ArrivalId    *uint        `json:"arrivalId" form:"arrivalId" gorm:"column:arrival_id;comment:;type:bigint"`
 	ClassesId    *uint        `json:"classesId" form:"classesId" gorm:"column:classes_id;comment:;type:bigint"`
 	CheckinTime  string       `json:"checkinTime" form:"checkinTime" gorm:"column:checkin_time;comment:;type:time"`
+	Reason       string       `json:"reason" form:"reason" gorm:"column:reason;comment:;type:varchar(100)"`
 	CheckinDate  string       `json:"checkinDate" form:"checkinDate" gorm:"column:checkin_date;comment:;type:date"`
 	Arrival      *ArrivalInfo `json:"arrivalInfo" form:"arrivalInfo" gorm:"foreignKey:ArrivalId"`
 }

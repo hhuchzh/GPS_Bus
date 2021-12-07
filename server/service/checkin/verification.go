@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	defaultTimeout  = 5 * time.Minute
+	defaultTimeout  = 20 * time.Minute
 	defaultDistance = 100.0
 )
 
