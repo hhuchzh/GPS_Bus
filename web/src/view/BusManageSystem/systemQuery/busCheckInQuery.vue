@@ -52,7 +52,7 @@
         <el-table-column label="站点时间" prop="arrivalInfo.arrivalTime" min-width="150" align="center" />
         <el-table-column label="打卡状态" prop="checkinTime" min-width="150" align="center">
           <template #default="scope">
-            <span v-if="scope.row.checkinTime==='00:00:00'" style="color: red">异常打卡</span>
+            <span v-if="scope.row.checkinTime==='00:00:00'" style="color: red">{{ scope.row.reason }}</span>
             <span v-else style="color: black">正常打卡</span>
           </template>
         </el-table-column>
