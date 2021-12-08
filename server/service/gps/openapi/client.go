@@ -10,8 +10,11 @@ import (
 )
 
 const (
-    appKey = "8FB345B8693CCD00A8998F0F1B857182"
+   /* appKey = "8FB345B8693CCD00A8998F0F1B857182"
     appSecret = "69c9941dce84408a834d3e0286bddfa6"
+   */
+    appKey = "8FB345B8693CCD00C83C1C3A959F05EB"
+    appSecret = "2ffa20ea2f7f4d0695a12cbdbc01b3c1"
     userID = "讯致网络"
     userPwd = "1qaz!QAZ"
     tokenExpiresIn = 7200
