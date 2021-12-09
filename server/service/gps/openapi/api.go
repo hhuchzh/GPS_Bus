@@ -65,6 +65,7 @@ func (a *Api) SendPost(params map[string]string, secret string, result interface
         fmt.Println("api post error")
         return errors.New("api post error")
     }
+    fmt.Println(resp)
     err = json.Unmarshal(resp.Body(), result)
     if err != nil {
         return err
