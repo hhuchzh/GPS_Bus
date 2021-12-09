@@ -146,7 +146,7 @@ func (monitor *CheckinMonitor) monitorClasses(classes *autocode.ClassesInfo) {
 		return
 	}
 
-	//global.GVA_LOG.Info("monitor classes...", zap.Uint("classes_id", classes.ID), zap.Uint("bus_id", *classes.BusId), zap.String("gps_sn", gpsSN))
+	global.GVA_LOG.Info("monitor classes...", zap.Uint("classes_id", classes.ID), zap.Uint("bus_id", *classes.BusId), zap.String("gps_sn", gpsSN))
 	list, err := monitor.loadArrivals(uint64(classes.ID))
 	if err != nil {
 		global.GVA_LOG.Info("monitor classes..., can not load arrival", zap.Uint("classes_id", classes.ID), zap.Error(err))
@@ -171,6 +171,7 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 	global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.Uint("location_id", *arrival.LocationId))
 
+	//now := time.Now().Add(-24 * time.Hour)
 	now := time.Now()
 	date := now.Format("2006-01-02")
 
@@ -250,7 +251,7 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 		diff, _ = time.ParseDuration("5m")
 		start = st.Add(diff)
-		diff, _ = time.ParseDuration("20")
+		diff, _ = time.ParseDuration("20m")
 		end = st.Add(diff)
 		extraList1, extraErr1 := monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"))
 
