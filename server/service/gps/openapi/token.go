@@ -16,43 +16,36 @@ type token struct {
     mu sync.RWMutex
     get getFunc
     refresh refreshFunc
+    needUpdate chan struct {}
 }
 
 func (t *token) start(get getFunc, refresh refreshFunc) {
-    var needUpdate bool
-    var delay int64
     t.get = get
     t.refresh = refresh
+    t.needUpdate = make(chan struct{})
     err := t.loadToken()
     if err != nil {
-         needUpdate = true
-    } else {
-        if t.lastToken != nil {
-            delay, _ = timeDelay(t.lastToken.Time)
-        }
-        if delay <= 0 {
-            needUpdate = true
-            delay = tokenExpiresIn - 60
-        }
-    }
-    if needUpdate {
         t.update()
         t.saveToken()
     }
-    go func() {
-        timer := time.NewTimer(time.Duration(delay)*time.Second)
+
+    go func () {
         for {
             select {
-            case <-timer.C:
-                t.forceUpdate()
-                t.saveToken()
-                timer.Reset((tokenExpiresIn - 60) * time.Second)
+            case <-t.needUpdate:
+                    fmt.Println("--> token need update")
+                    t.update()
+                    t.saveToken()
             }
         }
     }()
 }
 
 func (t *token) stop() {
+}
+
+func (t *token) updateToken() {
+    t.needUpdate <- struct{}{}
 }
 
 func (t *token) update() {
