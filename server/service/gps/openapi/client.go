@@ -108,6 +108,9 @@ func (c *Client) ListDevice() ([]*Device, error) {
         return nil, err
     }
     if resp.Code != 0 {
+        if resp.Code == 1004 {
+            c.tok.updateToken()
+        }
         return nil, errors.New(resp.Message)
     }
 
@@ -130,6 +133,9 @@ func (c *Client) ListLocation() ([]*Location, error) {
         return nil, err
     }
     if resp.Code != 0 {
+        if resp.Code == 1004 {
+            c.tok.updateToken()
+        }
         return nil, errors.New(resp.Message)
     }
 
@@ -158,6 +164,9 @@ func (c *Client) GetLocation(imeis []string) ([]*Location, error) {
         return nil, err
     }
     if resp.Code != 0 {
+        if resp.Code == 1004 {
+            c.tok.updateToken()
+        }
         return nil, errors.New(resp.Message)
     }
 
@@ -182,6 +191,9 @@ func (c *Client) ListTrack(imei, beginTime, endTime string) ([]*Track, error) {
         return nil, err
     }
     if resp.Code != 0 {
+        if resp.Code == 1004 {
+            c.tok.updateToken()
+        }
         return nil, errors.New(resp.Message)
     }
 
