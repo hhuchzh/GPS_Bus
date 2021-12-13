@@ -116,12 +116,15 @@ export default {
       this.getListData()
     },
     getDistance(data) {
-      var tmp = Math.floor(data * 100) / 100000
-      if (tmp > 0) {
-        return tmp.toPrecision(4)
+      var dis = 0
+      if (data >= 10) {
+        dis = (data / 1000).toFixed(2)
+      } else if (data > 0 && data < 10) {
+        dis = 0.01
       } else {
-        return tmp
+        dis = 0
       }
+      return dis
     },
     disabledDate(date) {
       return date.getTime() > Date.now() - 24 * 60 * 60 * 1000
