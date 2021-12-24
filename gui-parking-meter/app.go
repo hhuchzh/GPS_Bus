@@ -56,7 +56,7 @@ func NewApp() *App {
 func (a *App) Run() {
 	err := MainWindow{
 		AssignTo: &a.mw.MainWindow,
-		Title:    "公共停车场收费违规检测",
+		Title:    "易查停-南京市公共停车收费审核系统",
 		MinSize:  Size{Width: 600, Height: 400},
 		MaxSize:  Size{Width: 600, Height: 800},
 		Size:     Size{600, 400},

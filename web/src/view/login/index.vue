@@ -79,7 +79,6 @@
       <footer class="footer" data-automation="footer">
         <div class="copyright ta-c">
           © 2021 研创园车辆管理系统
-          <a href="https://beian.miit.gov.cn" target="_blank">粤ICP备15058697号</a>
         </div>
       </footer>
     </div>
