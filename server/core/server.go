@@ -30,8 +30,7 @@ func RunWindowsServer() {
 	time.Sleep(10 * time.Microsecond)
 	global.GVA_LOG.Info("server run success on ", zap.String("address", address))
 
-	fmt.Printf(`
-	欢迎使用 研创园车辆管理系统 
-`, address)
+	fmt.Printf(`欢迎使用 研创园车辆管理系统 `, address)
+
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
 }

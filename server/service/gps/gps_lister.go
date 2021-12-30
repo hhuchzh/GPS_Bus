@@ -1,6 +1,8 @@
 package gps
 
 import (
+	"fmt"
+
 	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 
@@ -63,7 +65,8 @@ func (g *GPSLister) ListTrack(imei, beginTime, endTime string) (interface{}, err
 }
 
 func (g *GPSLister) Start() {
-	global.GVA_LOG.Info("****** GPSLister Start")
+	fmt.Println("****** GPSLister Start")
+
 	g.cron = cron.New(cron.WithSeconds())
 	_, err := g.cron.AddFunc(cronJobSpec, func() {
 		location, err := g.client.ListLocation()
