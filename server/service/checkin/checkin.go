@@ -79,33 +79,33 @@ func NewMonitor() *CheckinMonitor {
 
 }
 
-//func (monitor *CheckinMonitor) Run() {
-//	global.GVA_LOG.Info("Create checkin monitor...")
-//
-//	list, cnt, err := monitor.loadClassses()
-//	if err != nil {
-//		global.GVA_LOG.Error("load classes failure", zap.Error(err))
-//		return
-//	}
-//	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
-//
-//	classes, ok := list.([]autocode.ClassesInfo)
-//	if !ok {
-//		global.GVA_LOG.Error("convert to ClassesInfo failure")
-//		return
-//	}
-//
-//	for _, classInfo := range classes {
-//		monitor.monitorClasses(&classInfo)
-//	}
-//
-//	if err != nil {
-//		fmt.Println("GPSLister Start crontab failed: ", err)
-//		return
-//	}
-//	//monitor.cron.Start()
-//
-//}
+// func (monitor *CheckinMonitor) Run() {
+// 	global.GVA_LOG.Info("Create checkin monitor...")
+
+// 	list, cnt, err := monitor.loadClassses()
+// 	if err != nil {
+// 		global.GVA_LOG.Error("load classes failure", zap.Error(err))
+// 		return
+// 	}
+// 	global.GVA_LOG.Info("classes is loaded...", zap.Int64("total cnt", cnt))
+
+// 	classes, ok := list.([]autocode.ClassesInfo)
+// 	if !ok {
+// 		global.GVA_LOG.Error("convert to ClassesInfo failure")
+// 		return
+// 	}
+
+// 	for _, classInfo := range classes {
+// 		monitor.monitorClasses(&classInfo)
+// 	}
+
+// 	if err != nil {
+// 		fmt.Println("GPSLister Start crontab failed: ", err)
+// 		return
+// 	}
+// 	//monitor.cron.Start()
+
+// }
 
 // Run xxx
 func (monitor *CheckinMonitor) Run() {
@@ -171,8 +171,8 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 	global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.Uint("location_id", *arrival.LocationId))
 
-	//now := time.Now().Add(-24 * time.Hour)
-	now := time.Now()
+	now := time.Now().Add(-24 * time.Hour)
+	//now := time.Now()
 	date := now.Format("2006-01-02")
 
 	if arrival.Location == nil {
@@ -187,91 +187,33 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 	st, _ := time.Parse("2006-01-02 15:04:05", t)
 
-	m, _ := time.ParseDuration("-5m")
-	start := st.Add(m)
-	m, _ = time.ParseDuration("5m")
-	end := st.Add(m)
-
-	list, err := monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"))
-
-	if err != nil {
-		global.GVA_LOG.Error("load gps details failure", zap.Error(err))
-		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
-		return
-	}
-
-	gpsList, ok := list.([]gps.GpsDetail)
-	if !ok {
-		global.GVA_LOG.Error("convert gps failure")
-		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
-		return
-	}
-
-	global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.String("arrival_time", t), zap.Int("gps_detail_cnt", len(gpsList)))
-
 	var bSuccess bool
 	var gpsVar gps.GpsDetail
 	var gpsTime time.Time
-	for _, gpsVar = range gpsList {
-		curLng, _ := strconv.ParseFloat(arrival.Location.Longtitude, 64)
-		curLat, _ := strconv.ParseFloat(arrival.Location.Latitude, 64)
+	bSuccess = false
 
-		stringSlice := strings.Split(gpsVar.GpsTime, "T")
-		gpsTime, _ = time.Parse("2006-01-02 15:04:05", stringSlice[0]+" "+strings.Split(stringSlice[1], "+")[0])
+	for i := 0; i < 20; i++ {
+		start := st.Add(time.Duration(-1*(i+1)) * time.Minute)
+		end := st.Add(time.Duration(-1*i) * time.Minute)
+		list, err := monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"), false)
 
-		src := checkinMeta{
-			lng: curLng,
-			lat: curLat,
-			t:   st,
-		}
-
-		dst := checkinMeta{
-			lng: gpsVar.Lng,
-			lat: gpsVar.Lat,
-			t:   gpsTime,
-		}
-
-		bSuccess = monitor.verify.verifyCheckin(&src, &dst)
-		if bSuccess {
-			break
-		}
-	}
-
-	if bSuccess {
-		global.GVA_LOG.Info("checkin success")
-		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, gpsTime.Format("15:04:05"), "", date)
-	} else {
-		global.GVA_LOG.Info("can not find checkin, check more duration[-20m, 20m]")
-		// check more gps detail infos
-		diff, _ := time.ParseDuration("-20m")
-		start = st.Add(diff)
-		diff, _ = time.ParseDuration("-5m")
-		end = st.Add(diff)
-		extraList, extraErr := monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"))
-
-		diff, _ = time.ParseDuration("5m")
-		start = st.Add(diff)
-		diff, _ = time.ParseDuration("20m")
-		end = st.Add(diff)
-		extraList1, extraErr1 := monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"))
-
-		if extraErr != nil || extraErr1 != nil {
-			global.GVA_LOG.Error("load extra gps details failure", zap.Error(err))
+		if err != nil {
+			global.GVA_LOG.Error("load gps details failure", zap.Error(err))
 			_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
 			return
 		}
 
-		extraGpsList, extraOk := extraList.([]gps.GpsDetail)
-		extraGpsList1, extraOk1 := extraList1.([]gps.GpsDetail)
-		if !extraOk || !extraOk1 {
-			global.GVA_LOG.Error("convert extra gps failure")
+		gpsList, ok := list.([]gps.GpsDetail)
+		if !ok {
+			global.GVA_LOG.Error("convert gps failure")
 			_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
 			return
 		}
 
-		extraGpsList = append(extraGpsList, extraGpsList1...)
+		global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.String("arrival_time", t), zap.Int("gps_detail_cnt", len(gpsList)))
 
-		for _, gpsVar = range extraGpsList {
+		bSuccess = false
+		for _, gpsVar = range gpsList {
 			curLng, _ := strconv.ParseFloat(arrival.Location.Longtitude, 64)
 			curLat, _ := strconv.ParseFloat(arrival.Location.Latitude, 64)
 
@@ -292,13 +234,72 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 			bSuccess = monitor.verify.verifyCheckin(&src, &dst)
 			if bSuccess {
-				_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", gpsTime.Format("15:04:05"), date)
+				if i < 5 {
+					global.GVA_LOG.Info("checkin success")
+					_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, gpsTime.Format("15:04:05"), "", date)
+				} else {
+					global.GVA_LOG.Info("checkin in over 5 minutes", zap.Int("minute", -i))
+					_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", gpsTime.Format("15:04:05"), date)
+				}
 				return
 			}
 		}
 
-		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "no checkin -/+ 20min", date)
+		start = st.Add(time.Duration(1*i) * time.Minute)
+		end = st.Add(time.Duration(1*(i+1)) * time.Minute)
+		list, err = monitor.loadGpsDetails(gpsSN, start.Format("2006-01-02 15:04:05"), end.Format("2006-01-02 15:04:05"), true)
+
+		if err != nil {
+			global.GVA_LOG.Error("load gps details failure", zap.Error(err))
+			_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
+			return
+		}
+
+		gpsList, ok = list.([]gps.GpsDetail)
+		if !ok {
+			global.GVA_LOG.Error("convert gps failure")
+			_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "Unexcepted Error", date)
+			return
+		}
+
+		global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.String("arrival_time", t), zap.Int("gps_detail_cnt", len(gpsList)))
+
+		bSuccess = false
+		for _, gpsVar = range gpsList {
+			curLng, _ := strconv.ParseFloat(arrival.Location.Longtitude, 64)
+			curLat, _ := strconv.ParseFloat(arrival.Location.Latitude, 64)
+
+			stringSlice := strings.Split(gpsVar.GpsTime, "T")
+			gpsTime, _ = time.Parse("2006-01-02 15:04:05", stringSlice[0]+" "+strings.Split(stringSlice[1], "+")[0])
+
+			src := checkinMeta{
+				lng: curLng,
+				lat: curLat,
+				t:   st,
+			}
+
+			dst := checkinMeta{
+				lng: gpsVar.Lng,
+				lat: gpsVar.Lat,
+				t:   gpsTime,
+			}
+
+			bSuccess = monitor.verify.verifyCheckin(&src, &dst)
+			if bSuccess {
+				if i < 5 {
+					global.GVA_LOG.Info("checkin success")
+					_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, gpsTime.Format("15:04:05"), "", date)
+				} else {
+					global.GVA_LOG.Info("checkin in over 5 minutes", zap.Int("minute", i))
+					_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", gpsTime.Format("15:04:05"), date)
+				}
+				return
+			}
+		}
+
 	}
+
+	_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "", "no checkin -/+ 20min", date)
 
 }
 
@@ -316,13 +317,21 @@ func (monitor *CheckinMonitor) loadGpsSn(busId uint) (string, error) {
 
 }
 
-func (monitor *CheckinMonitor) loadGpsDetails(gpsSn string, startTime string, endTime string) (list interface{}, err error) {
-	global.GVA_LOG.Info("load gps details", zap.String("start", startTime), zap.String("end", endTime))
+func (monitor *CheckinMonitor) loadGpsDetails(gpsSn string, startTime string, endTime string, order bool) (list interface{}, err error) {
+	global.GVA_LOG.Info("load gps details", zap.String("start", startTime), zap.String("end", endTime), zap.Bool("order", order))
+	orderStr := "gps_time "
+	if order {
+		orderStr += "asc"
+	} else {
+		orderStr += "desc"
+	}
+
 	db := global.GVA_DB.Model(&gps.GpsDetail{})
 	var gdList []gps.GpsDetail
 	db = db.Where("`gps_sn` = ?", gpsSn)
 	db = db.Where("`gps_time` >= ?", startTime)
 	db = db.Where("`gps_time` <= ?", endTime)
+	db = db.Order(orderStr)
 	err = db.Find(&gdList).Error
 	return gdList, err
 }

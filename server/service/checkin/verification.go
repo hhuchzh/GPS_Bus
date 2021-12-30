@@ -2,11 +2,14 @@ package checkin
 
 import (
 	"time"
+
+	"github.com/flipped-aurora/gin-vue-admin/server/global"
+	"go.uber.org/zap"
 )
 
 const (
 	defaultTimeout  = 20 * time.Minute
-	defaultDistance = 100.0
+	defaultDistance = 150.0
 )
 
 type verification struct {
@@ -37,10 +40,12 @@ func (veri *verification) verifyCheckin(src *checkinMeta, dst *checkinMeta) bool
 	}
 
 	deltaS, _ := getDistance(src.lat, dst.lat, src.lng, dst.lng)
+
 	if deltaS > veri.distance {
+		global.GVA_LOG.Info("gps diff exceed", zap.Float64("diff", deltaS))
 		return false
 	}
-
+	global.GVA_LOG.Info("gps diff ok", zap.Float64("diff", deltaS))
 	return true
 }
 
