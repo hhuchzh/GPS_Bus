@@ -84,6 +84,9 @@ timer:
   - tableName: sys_operation_records
     compareField: created_at
     interval: 2160h
+  - tableName: gps_detail
+    compareField: gps_time
+    interval: 2160h
 zap:
   level: info
   format: console
