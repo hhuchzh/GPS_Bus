@@ -171,8 +171,8 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 
 	global.GVA_LOG.Info("monitor arrival...", zap.Uint("arrival_id", arrival.ID), zap.Uint("location_id", *arrival.LocationId))
 
-	now := time.Now().Add(-24 * time.Hour)
-	//now := time.Now()
+	//now := time.Now().Add(-24 * time.Hour)
+	now := time.Now()
 	date := now.Format("2006-01-02")
 
 	if arrival.Location == nil {
