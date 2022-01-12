@@ -263,7 +263,9 @@ export default {
     },
     async updateClassesInfo(row) {
       const res = await findClassesInfo({ ID: row.ID })
-      this.currentSelectedPlate = row.busInfo.busPlate
+      if (row.busInfo) {
+        this.currentSelectedPlate = row.busInfo.busPlate
+      }
       // alert(this.currentSelectedPlate)
       this.type = 'edit'
       if (res.code === 0) {

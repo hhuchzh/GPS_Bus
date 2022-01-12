@@ -127,7 +127,7 @@ export default {
       const res = await getClassesInfoList({ routeId: parseInt(routeId) })
       if (res.code === 0) {
         this.classList = res.data.list
-        if (this.classList && this.classList.length > 0) {
+        if (this.classList && this.classList.length > 0 && this.classList[0].busInfo) {
           this.currnetSelectClassName = this.classList[0].remark + '(' + this.classList[0].busInfo.busPlate + ')'
           this.currnetSelectBusId = this.classList[0].busId
           this.currentSelectClassId = this.classList[0].ID
