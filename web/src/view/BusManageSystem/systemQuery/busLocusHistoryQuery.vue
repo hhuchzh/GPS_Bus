@@ -449,10 +449,11 @@ export default {
       console.log(data)
       if (data.code === 0) {
         this.locationPointsList = []
+        var tem_idx = 0
         for (var i = 0; i < data.data.list.length; i++) {
           if (data.data.list[i].Location) {
             this.locationPointsList.push(new window.BMap.Point(data.data.list[i].Location.longtitude, data.data.list[i].Location.latitude))
-            var locationMarker = new window.BMap.Marker(this.locationPointsList[i])
+            var locationMarker = new window.BMap.Marker(this.locationPointsList[tem_idx])
             var tempLabel = new window.BMap.Label(data.data.list[i].Location.orderNo + '-' + data.data.list[i].Location.locationName, {
               offset: new window.BMap.Size(20, -10)
             })
@@ -473,6 +474,7 @@ export default {
             })
             locationMarker.setLabel(tempLabel)
             this.map.addOverlay(locationMarker)
+            tem_idx++
           }
         }
         /* var polyline
