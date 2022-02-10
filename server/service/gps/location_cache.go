@@ -43,10 +43,14 @@ func (lc *locationCache) list() ([]openapi.Location, error) {
 }
 
 func (lc *locationCache) replace(location []*openapi.Location) []*openapi.Location {
+    var diff []*openapi.Location
+    if len(location) == 0 {
+        return diff
+    }
+
     lc.mu.Lock()
     defer lc.mu.Unlock()
 
-    var diff []*openapi.Location
     for i, loc := range location {
         idx, ok := lc.index[loc.Imei]
         if !ok {
