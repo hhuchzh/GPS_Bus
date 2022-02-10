@@ -181,6 +181,12 @@ func (monitor *CheckinMonitor) monitorArrival(gpsSN string, arrival *autocode.Ar
 		return
 	}
 
+	if arrival.ArrivalTime == "00:01:00" {
+		global.GVA_LOG.Info("check 00:01:00, check in passed")
+		_ = monitor.updateCheckin(arrival.ID, *arrival.ClassesId, "00:01:00", "", date)
+		return
+	}
+
 	t := arrival.ArrivalTime
 	t = strings.Join([]string{date, t}, " ")
 	global.GVA_LOG.Debug("arrival time..", zap.String("arrival time", t))
@@ -476,6 +482,11 @@ func (monitor *CheckinMonitor) ExportExcel(plate string, start string, end strin
 		if checkinTime == "00:00:00" {
 			checkinTime = "打卡异常"
 		}
+
+		if checkinTime == "00:01:00" {
+			checkinTime = "打卡正常"
+		}
+
 		f.SetCellValue("Sheet1", service.FormatCoord(row, 10), checkinTime)
 		f.SetCellValue("Sheet1", service.FormatCoord(row, 11), checkinItem.Reason)
 		row++
