@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 	"sort"
+	"math"
 
     "github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
@@ -126,9 +127,12 @@ func (ms *MileageStat) statArrival(classesid uint, gpsSN string, beginTime, endT
     var totalDist float64
     for _, gps := range gpsList {
         dist := GetDistance(prevLat, prevLng, gps.Lat, gps.Lng)
-        totalDist += dist
         prevLat = gps.Lat
         prevLng = gps.Lng
+        if (math.IsNaN(dist)) {
+            continue
+        }
+        totalDist += dist
     }
     _ = ms.updateMileage(classesid, totalDist, date)
 }
