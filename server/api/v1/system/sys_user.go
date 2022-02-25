@@ -45,6 +45,28 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 }
 
+func (b *BaseApi) LoginToken(c *gin.Context) {
+	var req systemReq.LoginUser
+	//_ = c.ShouldBindJSON(&req)
+	_ = c.ShouldBindQuery(&req)
+
+	//global.GVA_LOG.Info("username ...", zap.String("name", req.Username))
+	//global.GVA_LOG.Info("password ...", zap.String("password", req.Password))
+
+	if req.Username == "" || req.Password == "" {
+		response.FailWithMessage("必须指定用户名和密码", c)
+		return
+	}
+
+	u := &system.SysUser{Username: req.Username, Password: req.Password}
+	if err, user := userService.Login(u); err != nil {
+		global.GVA_LOG.Error("登陆失败! 用户名不存在或者密码错误!", zap.Any("err", err))
+		response.FailWithMessage("用户名不存在或者密码错误", c)
+	} else {
+		b.tokenNext(c, *user)
+	}
+}
+
 // 登录以后签发jwt
 func (b *BaseApi) tokenNext(c *gin.Context, user system.SysUser) {
 	j := &middleware.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
