@@ -20,8 +20,6 @@ type RouteGroup struct {
 }
 
 func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
-
-	var statInfo model.StatInfo
 	var groupField = "route_name_ex"
 	var cnt int64
 	var stat model.StatInfo
@@ -29,7 +27,7 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 	// get route infos
 	var routeGroups []RouteGroup
 	db := global.GVA_DB.Model(&autocode.RouteInfo{})
-	result := db.Select(groupField).Where(groupField + "is not null").Group(groupField).Find(&routeGroups)
+	result := db.Select(groupField + " as identifier").Where(groupField + " is not null").Group(groupField).Find(&routeGroups)
 	_ = result.Count(&cnt)
 
 	stat.RouteNum = int(cnt)
@@ -52,7 +50,7 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 	now := time.Now().Add(-24 * time.Hour * 30)
 	date := now.Format("2006-01-02")
 	db = global.GVA_DB.Model(&autocode.MilesInfo{})
-	db.Select("sum(distance) as n").Where("cal_data > ?", date).Scan(&n)
+	db.Select("sum(distance) as n").Where("cal_date > ?", date).Scan(&n)
 	stat.TotalMileage = int(n.N) / 1000
 	global.GVA_LOG.Info("statistics:", zap.Int("Mileage(30 days)", stat.TotalMileage))
 
@@ -78,8 +76,15 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 			RouteName:  routeGroup.Identifier,
 			ShuttleNum: len(mapBus),
 		}
-		statInfo.ShuttleLineList = append(stat.ShuttleLineList, shuttline)
+		stat.ShuttleLineList = append(stat.ShuttleLineList, shuttline)
 	}
 
-	return &statInfo, nil
+	return &stat, nil
+}
+
+func Init() {
+	global.GVA_LOG.Info("statistic...")
+	var ss StatService
+	p := &ss
+	p.GetShuttleStatistics()
 }

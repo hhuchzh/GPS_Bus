@@ -5,8 +5,9 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize"
 	"github.com/flipped-aurora/gin-vue-admin/server/service/checkin"
-	"github.com/flipped-aurora/gin-vue-admin/server/service/mileage"
 	_ "github.com/flipped-aurora/gin-vue-admin/server/service/gps"
+	"github.com/flipped-aurora/gin-vue-admin/server/service/mileage"
+	_ "github.com/flipped-aurora/gin-vue-admin/server/service/stat"
 )
 
 //go:generate go env -w GO111MODULE=on
@@ -34,6 +35,8 @@ func main() {
 	}
 
 	checkin.Init()
-    mileage.Init()
+	mileage.Init()
+	//stat.Init()
+
 	core.RunWindowsServer()
 }
