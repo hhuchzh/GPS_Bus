@@ -14,10 +14,10 @@ type StatApi struct {
 var statService = service.ServiceGroupApp.StatServiceGroup.StatService
 
 func (ga *StatApi) GetShuttleStatistics(c *gin.Context) {
-	if location, err := statService.GetShuttleStatistics(); err != nil {
+	if stat, err := statService.GetShuttleStatistics(); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
 		response.FailWithMessage("查询失败", c)
 	} else {
-		response.OkWithData(gin.H{"location": location}, c)
+		response.OkWithData(gin.H{"stat": stat}, c)
 	}
 }
