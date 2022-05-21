@@ -19,6 +19,7 @@ type RouteInfo struct {
 	EndAddress    string         `json:"endAddress" form:"endAddress" gorm:"column:end_address;comment:结束地点;type:varchar(100);"`
 	AboutTime     *time.Time     `json:"aboutTime" form:"aboutTime" gorm:"column:about_time;comment:大约时间;type:time"`
 	AboutDistance *int           `json:"aboutDistance" form:"aboutDistance" gorm:"column:about_distance;comment:大约距离;type:int"`
+	RouteNameEx   string         `json:"routeNameEx" form:"routeName" gorm:"column:route_name_ex;comment:路线名EX;type:varchar(100);"`
 	LocationInfos []LocationInfo `gorm:"foreignKey:RouteId"`
 }
 

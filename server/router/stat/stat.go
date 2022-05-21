@@ -14,6 +14,6 @@ func (s *StatRouter) InitStatRouter(Router *gin.RouterGroup) {
 	var statApi = v1.ApiGroupApp.StatApiGroup.StatApi
 	{
 
-		statRouter.GET("location", statApi.GetShuttleStatistics)
+		statRouter.GET("getShuttleStatistics", statApi.GetShuttleStatistics)
 	}
 }
