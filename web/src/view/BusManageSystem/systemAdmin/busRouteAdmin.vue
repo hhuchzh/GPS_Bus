@@ -32,14 +32,15 @@
       <el-table-column label="路线名" prop="routeName" min-width="150" sortable="custom" align="center" />
       <el-table-column label="起始地点" prop="startAddress" min-width="150" sortable="custom" align="center" />
       <el-table-column label="结束地点" prop="endAddress" min-width="150" sortable="custom" align="center" />
-      <el-table-column label="大约时间" prop="aboutTime" min-width="150" sortable="custom" align="center">
+      <el-table-column label="大约时间" prop="aboutTime" min-width="100" sortable="custom" align="center">
         <template #default="scope">
           <div>
             {{ methodFiletr(scope.row.aboutTime) }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="大约距离" prop="aboutDistance" min-width="150" sortable="custom" align="center" />
+      <el-table-column label="大约距离" prop="aboutDistance" min-width="100" sortable="custom" align="center" />
+      <el-table-column label="路线总称" prop="routeNameEx" min-width="100" sortable="custom" align="center" />
       <!-- edit&del button -->
       <el-table-column fixed="right" label="操作" min-width="300" align="center">
         <template #default="scope">
@@ -81,6 +82,9 @@
         <el-form-item min-width="150" label="大约距离:" prop="aboutDistance">
           <el-input v-model.number="formData.aboutDistance" clearable placeholder="大约距离" autocomplete="off" />
         </el-form-item>
+        <el-form-item min-width="150" label="路线总称:" prop="routeNameEx">
+          <el-input v-model="formData.routeNameEx" clearable placeholder="路线总称" autocomplete="off" />
+        </el-form-item>
       </el-form>
       <template #footer>
         <div class="dialog-footer">
@@ -120,6 +124,7 @@ export default {
         endAddress: '',
         aboutTime: '',
         aboutDistance: '',
+        routeNameEx: ''
       },
       rules: {
         routeName: [{ required: true, message: '请输入路线名', trigger: 'blur' }],
@@ -208,6 +213,7 @@ export default {
         endAddress: '',
         aboutTime: '',
         aboutDistance: '',
+        routeNameEx: ''
       }
     },
     closeDialog() {
