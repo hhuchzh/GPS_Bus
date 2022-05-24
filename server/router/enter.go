@@ -5,13 +5,15 @@ import (
 	"github.com/flipped-aurora/gin-vue-admin/server/router/example"
 	"github.com/flipped-aurora/gin-vue-admin/server/router/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/router/gps"
+	"github.com/flipped-aurora/gin-vue-admin/server/router/stat"
 )
 
 type RouterGroup struct {
 	System   system.RouterGroup
 	Example  example.RouterGroup
 	Autocode autocode.RouterGroup
-    Gps      gps.RouterGroup
+        Gps gps.RouterGroup
+        Stat stat.RouterGroup
 }
 
 var RouterGroupApp = new(RouterGroup)

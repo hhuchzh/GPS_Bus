@@ -1,6 +1,7 @@
 package stat
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
@@ -78,6 +79,9 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 		}
 		stat.ShuttleLineList = append(stat.ShuttleLineList, shuttline)
 	}
+
+	fmt.Printf("\n\nxxxxxxxxxxxx\n%v\n\n", stat)
+	//fmt.Println(stat.ShuttleLineList)
 
 	return &stat, nil
 }
