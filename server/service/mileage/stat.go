@@ -143,7 +143,10 @@ func (ms *MileageStat) updateMileage(classes uint, dist float64, date string) er
 	mileage.CreatedAt = t
 	mileage.UpdatedAt = t
 	mileage.ClassesId = &classes
-    mileage.CalcDate = date
+	if classes>=142 && classes<=167 && dist>2000 {
+		dist+=3000
+	}
+        mileage.CalcDate = date
 	mileage.Distance = dist
 	global.GVA_LOG.Info("update miles...", zap.Uint("classes_id", classes), zap.String("date", date), zap.Float64("distance", dist))
 
