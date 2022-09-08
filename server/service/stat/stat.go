@@ -2,9 +2,9 @@ package stat
 
 import (
 	"fmt"
-	"time"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
@@ -41,6 +41,12 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 	db.Count(&cnt)
 	stat.ShuttleNum = int(cnt)
 	global.GVA_LOG.Info("statistics:", zap.Int("Shuttle Num", stat.ShuttleNum))
+
+	// get classes infos
+	db = global.GVA_DB.Model(&autocode.ClassesInfo{})
+	db.Count(&cnt)
+	stat.ClassesNum = int(cnt)
+	global.GVA_LOG.Info("Classes:", zap.Int("Classes Num", stat.ClassesNum))
 
 	// get location info
 	db = global.GVA_DB.Model(&autocode.LocationInfo{})
@@ -82,14 +88,14 @@ func (ss *StatService) GetShuttleStatistics() (*model.StatInfo, error) {
 		stat.ShuttleLineList = append(stat.ShuttleLineList, shuttline)
 	}
 
-	sort.SliceStable(stat.ShuttleLineList,func(i int, j int) bool{
-		numA,_:=strconv.Atoi(stat.ShuttleLineList[i].RouteName[1:])
-		numB,_:=strconv.Atoi(stat.ShuttleLineList[j].RouteName[1:])
+	sort.SliceStable(stat.ShuttleLineList, func(i int, j int) bool {
+		numA, _ := strconv.Atoi(stat.ShuttleLineList[i].RouteName[1:])
+		numB, _ := strconv.Atoi(stat.ShuttleLineList[j].RouteName[1:])
 		return numA < numB
 	})
 
 	fmt.Printf("\n\nxxxxxxxxxxxx\n%v\n\n", stat)
-//	fmt.Println(stat.ShuttleLineList)
+	//	fmt.Println(stat.ShuttleLineList)
 
 	return &stat, nil
 }
