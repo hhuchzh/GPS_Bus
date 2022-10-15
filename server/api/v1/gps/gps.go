@@ -37,6 +37,18 @@ func (ga *GpsApi) GetLocation(c *gin.Context) {
 	}
 }
 
+func (ga *GpsApi) GetLocationEx(c *gin.Context) {
+	var gsEx gpsreq.GpsDetailSearchEx
+	_ = c.ShouldBindQuery(&gsEx)
+	if location, err := gpsService.GetRouteLocation(gsEx.GpsSnList); err != nil {
+		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
+		response.FailWithMessage("查询失败", c)
+	} else {
+		response.OkWithData(gin.H{"location": location}, c)
+	}
+}
+
+
 func (ga *GpsApi) ListDevice(c *gin.Context) {
 	if device, err := gpsService.ListDevice(); err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))

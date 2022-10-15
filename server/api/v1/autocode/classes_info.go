@@ -1,21 +1,22 @@
 package autocode
 
 import (
+	"time"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
-    autocodeReq "github.com/flipped-aurora/gin-vue-admin/server/model/autocode/request"
-    "github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
-    "github.com/flipped-aurora/gin-vue-admin/server/service"
-    "github.com/gin-gonic/gin"
-    "go.uber.org/zap"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/autocode"
+	autocodeReq "github.com/flipped-aurora/gin-vue-admin/server/model/autocode/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
+	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
+	"github.com/flipped-aurora/gin-vue-admin/server/service"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type ClassesInfoApi struct {
 }
 
 var classesInfoService = service.ServiceGroupApp.AutoCodeServiceGroup.ClassesInfoService
-
 
 // CreateClassesInfo 创建ClassesInfo
 // @Tags ClassesInfo
@@ -29,8 +30,11 @@ var classesInfoService = service.ServiceGroupApp.AutoCodeServiceGroup.ClassesInf
 func (classesInfoApi *ClassesInfoApi) CreateClassesInfo(c *gin.Context) {
 	var classesInfo autocode.ClassesInfo
 	_ = c.ShouldBindJSON(&classesInfo)
+	t := time.Now()
+	classesInfo.CreatedAt = t
+	classesInfo.UpdatedAt = t
 	if err := classesInfoService.CreateClassesInfo(classesInfo); err != nil {
-        global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("创建失败!", zap.Any("err", err))
 		response.FailWithMessage("创建失败", c)
 	} else {
 		response.OkWithMessage("创建成功", c)
@@ -50,7 +54,7 @@ func (classesInfoApi *ClassesInfoApi) DeleteClassesInfo(c *gin.Context) {
 	var classesInfo autocode.ClassesInfo
 	_ = c.ShouldBindJSON(&classesInfo)
 	if err := classesInfoService.DeleteClassesInfo(classesInfo); err != nil {
-        global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("删除失败!", zap.Any("err", err))
 		response.FailWithMessage("删除失败", c)
 	} else {
 		response.OkWithMessage("删除成功", c)
@@ -68,9 +72,9 @@ func (classesInfoApi *ClassesInfoApi) DeleteClassesInfo(c *gin.Context) {
 // @Router /classesInfo/deleteClassesInfoByIds [delete]
 func (classesInfoApi *ClassesInfoApi) DeleteClassesInfoByIds(c *gin.Context) {
 	var IDS request.IdsReq
-    _ = c.ShouldBindJSON(&IDS)
+	_ = c.ShouldBindJSON(&IDS)
 	if err := classesInfoService.DeleteClassesInfoByIds(IDS); err != nil {
-        global.GVA_LOG.Error("批量删除失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("批量删除失败!", zap.Any("err", err))
 		response.FailWithMessage("批量删除失败", c)
 	} else {
 		response.OkWithMessage("批量删除成功", c)
@@ -89,8 +93,12 @@ func (classesInfoApi *ClassesInfoApi) DeleteClassesInfoByIds(c *gin.Context) {
 func (classesInfoApi *ClassesInfoApi) UpdateClassesInfo(c *gin.Context) {
 	var classesInfo autocode.ClassesInfo
 	_ = c.ShouldBindJSON(&classesInfo)
+	t := time.Now()
+	classesInfo.CreatedAt = t
+	classesInfo.UpdatedAt = t
+
 	if err := classesInfoService.UpdateClassesInfo(classesInfo); err != nil {
-        global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("更新失败!", zap.Any("err", err))
 		response.FailWithMessage("更新失败", c)
 	} else {
 		response.OkWithMessage("更新成功", c)
@@ -110,7 +118,7 @@ func (classesInfoApi *ClassesInfoApi) FindClassesInfo(c *gin.Context) {
 	var classesInfo autocode.ClassesInfo
 	_ = c.ShouldBindQuery(&classesInfo)
 	if err, reclassesInfo := classesInfoService.GetClassesInfo(classesInfo.ID); err != nil {
-        global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
+		global.GVA_LOG.Error("查询失败!", zap.Any("err", err))
 		response.FailWithMessage("查询失败", c)
 	} else {
 		response.OkWithData(gin.H{"reclassesInfo": reclassesInfo}, c)
@@ -130,14 +138,14 @@ func (classesInfoApi *ClassesInfoApi) GetClassesInfoList(c *gin.Context) {
 	var pageInfo autocodeReq.ClassesInfoSearch
 	_ = c.ShouldBindQuery(&pageInfo)
 	if err, list, total := classesInfoService.GetClassesInfoInfoList(pageInfo); err != nil {
-	    global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
-        response.FailWithMessage("获取失败", c)
-    } else {
-        response.OkWithDetailed(response.PageResult{
-            List:     list,
-            Total:    total,
-            Page:     pageInfo.Page,
-            PageSize: pageInfo.PageSize,
-        }, "获取成功", c)
-    }
+		global.GVA_LOG.Error("获取失败!", zap.Any("err", err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(response.PageResult{
+			List:     list,
+			Total:    total,
+			Page:     pageInfo.Page,
+			PageSize: pageInfo.PageSize,
+		}, "获取成功", c)
+	}
 }
